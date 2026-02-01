@@ -109,7 +109,7 @@ public partial class GameDetailViewModel : ObservableObject
             StatusMessage = "Fetching from PCGW...";
 
             var title = Game.PCGWTitle ?? Game.Name;
-            var recipes = await _pcgwService.GetTweaksForGameAsync(title, Game.Id);
+            var recipes = await _pcgwService.GetAvailableTweaksAsync(title, Game.Id);
 
             Tweaks.Clear();
             foreach (var recipe in recipes)

@@ -148,7 +148,7 @@ public partial class MainViewModel : ObservableObject
             StatusMessage = $"Fetching wiki data for {SelectedGame.Name}...";
 
             var title = SelectedGame.PCGWTitle ?? SelectedGame.Name;
-            var recipes = await _pcgwService.GetTweaksForGameAsync(title, SelectedGame.Id);
+            var recipes = await _pcgwService.GetAvailableTweaksAsync(title, SelectedGame.Id);
 
             // Save to database
             _databaseService.DeleteRecipesForGame(SelectedGame.Id);
