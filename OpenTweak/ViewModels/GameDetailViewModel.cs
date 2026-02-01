@@ -1,3 +1,8 @@
+// OpenTweak - PC Game Optimization Tool
+// Copyright 2024-2025 OpenTweak Contributors
+// Licensed under PolyForm Shield License 1.0.0
+// See LICENSE.md for full terms.
+
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -43,7 +48,7 @@ public partial class GameDetailViewModel : ObservableObject
 
     public GameDetailViewModel()
     {
-        _databaseService = new DatabaseService();
+        _databaseService = DatabaseService.Instance;
         _backupService = new BackupService();
         _tweakEngine = new TweakEngine(_backupService);
         _pcgwService = new PCGWService();

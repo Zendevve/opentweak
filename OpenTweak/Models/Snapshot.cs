@@ -1,3 +1,8 @@
+// OpenTweak - PC Game Optimization Tool
+// Copyright 2024-2025 OpenTweak Contributors
+// Licensed under PolyForm Shield License 1.0.0
+// See LICENSE.md for full terms.
+
 namespace OpenTweak.Models;
 
 /// <summary>

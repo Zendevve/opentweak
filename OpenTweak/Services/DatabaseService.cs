@@ -1,3 +1,8 @@
+// OpenTweak - PC Game Optimization Tool
+// Copyright 2024-2025 OpenTweak Contributors
+// Licensed under PolyForm Shield License 1.0.0
+// See LICENSE.md for full terms.
+
 using System.IO;
 using LiteDB;
 using OpenTweak.Models;
@@ -7,20 +12,35 @@ namespace OpenTweak.Services;
 /// <summary>
 /// Database service using LiteDB for persistent storage.
 /// Single-file NoSQL database - no external dependencies.
+/// Uses singleton pattern to prevent multiple instances fighting over file lock.
 /// </summary>
 public class DatabaseService : IDisposable
 {
+    private static readonly Lazy<DatabaseService> _instance = new(() => new DatabaseService());
+
+    /// <summary>
+    /// Gets the shared DatabaseService instance.
+    /// </summary>
+    public static DatabaseService Instance => _instance.Value;
+
     private readonly LiteDatabase _db;
     private readonly ILiteCollection<Game> _games;
     private readonly ILiteCollection<TweakRecipe> _recipes;
     private readonly ILiteCollection<Snapshot> _snapshots;
 
-    public DatabaseService()
+    /// <summary>
+    /// Creates a new DatabaseService. Use <see cref="Instance"/> for shared access.
+    /// This constructor is public for testing with custom database paths.
+    /// </summary>
+    public DatabaseService() : this(GetDefaultDbPath())
     {
-        var dbPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "OpenTweak", "opentweaks.db");
+    }
 
+    /// <summary>
+    /// Creates a new DatabaseService with a custom database path (for testing).
+    /// </summary>
+    public DatabaseService(string dbPath)
+    {
         Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
 
         _db = new LiteDatabase(dbPath);
@@ -34,6 +54,10 @@ public class DatabaseService : IDisposable
         _recipes.EnsureIndex(r => r.GameId);
         _snapshots.EnsureIndex(s => s.GameId);
     }
+
+    private static string GetDefaultDbPath() => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "OpenTweak", "opentweaks.db");
 
     #region Games
 

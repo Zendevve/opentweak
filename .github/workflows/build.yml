@@ -1,12 +1,17 @@
-name: Build and Release
+name: Build and Test
 
 on:
   push:
     branches: [ main ]
-    tags:
-      - 'v*'
   pull_request:
     branches: [ main ]
+
+# IMPORTANT: This workflow does NOT produce downloadable binaries.
+# Pre-built binaries are available exclusively through BuyMeACoffee:
+# https://buymeacoffee.com/opentweak
+#
+# See LICENSE.md and docs/DISTRIBUTION.md for terms.
+# Automated build services that distribute binaries are PROHIBITED.
 
 jobs:
   build:
@@ -32,40 +37,10 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
 
-    - name: Publish Single-File Executable
-      run: |
-        dotnet publish OpenTweak/OpenTweak.csproj `
-          -c Release `
-          -r win-x64 `
-          --self-contained false `
-          -p:PublishSingleFile=true `
-          -o ./publish
-
-    - name: Upload Build Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: OpenTweak-win-x64
-        path: ./publish/
-        if-no-files-found: error
-
-  release:
-    needs: build
-    runs-on: windows-latest
-    if: startsWith(github.ref, 'refs/tags/v')
-
-    steps:
-    - name: Download Artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: OpenTweak-win-x64
-        path: ./release
-
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: ./release/*
-        draft: false
-        prerelease: false
-        generate_release_notes: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # Note: We intentionally do NOT publish or upload artifacts.
+    # This prevents automated distribution of binaries.
+    # Users must either:
+    #   1. Build from source (free)
+    #   2. Purchase from BuyMeACoffee ($25)
+    #
+    # See docs/COMMERCIAL.md for full terms.

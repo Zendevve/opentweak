@@ -1,3 +1,8 @@
+// OpenTweak - PC Game Optimization Tool
+// Copyright 2024-2025 OpenTweak Contributors
+// Licensed under PolyForm Shield License 1.0.0
+// See LICENSE.md for full terms.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -500,10 +505,8 @@ Edit {{file|audio.ini}} and set <code>BufferSize=512</code>
 
     private PCGWService CreateService()
     {
-        // Note: Since PCGWService creates its own HttpClient, we can't inject our mock directly.
-        // In a real refactoring scenario, we would add an IHttpClientFactory or HttpClient injection.
-        // For now, we test the service as-is and verify it handles errors gracefully.
-        return new PCGWService();
+        // Now that PCGWService supports HttpClient injection, we can inject our mock!
+        return new PCGWService(_httpClient);
     }
 
     private void SetupMockResponse(string urlPattern, string content)

@@ -2,6 +2,14 @@
 
 <https://polyformproject.org/licenses/shield/1.0.0>
 
+---
+
+**Required Notice:** Copyright 2024-2025 OpenTweak Contributors (https://github.com/nathanielopentweak/opentweak)
+
+**Licensor Line of Business:** OpenTweak PC Game Optimization Tool — Pre-built binary distribution via BuyMeACoffee (https://buymeacoffee.com/opentweak)
+
+---
+
 ## Acceptance
 
 In order to get any license under these terms, you must agree
@@ -22,10 +30,20 @@ License](#changes-and-new-works-license).
 ## Distribution License
 
 The licensor grants you an additional copyright license
-to distribute copies of the software.  Your license
-to distribute covers distributing the software with
-changes and new works permitted by [Changes and New Works
-License](#changes-and-new-works-license).
+to distribute copies of the software **ONLY** under the following conditions:
+
+1. **Source Code Distribution**: You may distribute the source code in its original or modified form, provided that:
+   - You include a complete copy of this license
+   - You do not distribute compiled binaries without explicit written permission
+   - You do not provide automated build services that produce binaries for third parties
+
+2. **Binary Distribution**: You may NOT distribute pre-built binaries of this software without explicit written permission from the licensor. This includes:
+   - Direct executable distribution
+   - Automated build services (CI/CD pipelines that produce downloadable binaries)
+   - Package managers (winget, chocolatey, scoop, etc.)
+   - Any other form of compiled distribution
+
+3. **Personal Use Exception**: You may compile and use the software for your own personal use without restriction.
 
 ## Notices
 
@@ -33,15 +51,17 @@ You must ensure that anyone who gets a copy of any part of
 the software from you also gets a copy of these terms or the
 URL for them above, as well as copies of any plain-text lines
 beginning with `Required Notice:` that the licensor provided
-with the software.  For example:
-
-> Required Notice: Copyright Yoyodyne, Inc. (http://example.com)
+with the software.
 
 ## Changes and New Works License
 
 The licensor grants you an additional copyright license to
 make changes and new works based on the software for any
-permitted purpose.
+permitted purpose, subject to the following restrictions:
+
+1. You may not create derivative works that primarily serve as a substitute for the software
+2. You may not create automated tools that build and distribute binaries of this software
+3. You may not wrap this software in a service that competes with the licensor's distribution
 
 ## Patent License
 
@@ -51,9 +71,17 @@ to license, that you would infringe by using the software.
 
 ## Noncompete
 
-Any purpose is a permitted purpose, except for providing any
-product that competes with the software or any product the
-licensor or any of its affiliates provides using the software.
+Any purpose is a permitted purpose, except for:
+
+1. **Providing any product that competes with the software or any product the licensor or any of its affiliates provides using the software.**
+
+2. **Operating automated build-from-source services** — Any service, platform, or tool that:
+   - Accepts this software's source code as input
+   - Automatically compiles/builds the software
+   - Distributes the resulting binaries to third parties
+   - This includes CI/CD services, automated build bots, and "build farms"
+
+3. **Redistributing binaries** — Creating, hosting, or distributing pre-compiled executables of this software without written permission
 
 ## Competition
 
@@ -66,6 +94,12 @@ or for different computer architectures.  Goods and services
 compete even when provided free of charge.  If you market a
 product as a practical substitute for the software or another
 product, it definitely competes.
+
+**Specifically prohibited competing activities include:**
+- Offering pre-built binaries of this software for download
+- Providing automated build services that produce downloadable binaries
+- Including this software in package managers or app stores
+- Creating "unofficial" builds or forks with binary distribution
 
 ## New Products
 
@@ -83,10 +117,7 @@ You may begin using the software to compete with a product
 or service that the licensor or any of its affiliates has
 stopped providing, unless the licensor includes a plain-text
 line beginning with `Licensor Line of Business:` with the
-software that mentions that line of business.  For example:
-
-> Licensor Line of Business: YoyodyneCMS Content Management
-> System (http://example.com/cms)
+software that mentions that line of business.
 
 ## Sales of Business
 
@@ -152,4 +183,39 @@ of your licenses.
 
 ---
 
-Required Notice: Copyright 2024 OpenTweak Contributors
+## Commercial Distribution Terms
+
+The licensor maintains exclusive rights to distribute pre-built binaries of this software.
+
+### Authorized Distribution
+
+The only authorized source for pre-built OpenTweak binaries is:
+- **BuyMeACoffee**: https://buymeacoffee.com/opentweak
+- **Price**: $25 USD per license
+
+### What You Get
+
+Purchasing a license provides:
+- Pre-built executable (no compilation required)
+- Convenience of immediate use
+- Priority support channel access
+
+### What Remains Free
+
+- Full source code access
+- Right to build from source for personal use
+- Right to modify and experiment
+- Community support via GitHub issues
+
+### Prohibited Distribution Channels
+
+The following are explicitly prohibited without written permission:
+- GitHub Releases with attached binaries
+- Package managers (winget, chocolatey, scoop)
+- Third-party download sites
+- Automated build services offering binaries
+- Any form of binary redistribution
+
+---
+
+*This license combines PolyForm Shield 1.0.0 with additional commercial distribution protections.*

@@ -1,3 +1,8 @@
+// OpenTweak - PC Game Optimization Tool
+// Copyright 2024-2025 OpenTweak Contributors
+// Licensed under PolyForm Shield License 1.0.0
+// See LICENSE.md for full terms.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,13 +21,31 @@ namespace OpenTweak.Services;
 /// </summary>
 public class PCGWService
 {
+    // Static HttpClient is the recommended pattern per Microsoft guidelines
+    // https://learn.microsoft.com/en-us/dotnet/fundamentals/networking/http/httpclient-guidelines
+    private static readonly HttpClient SharedHttpClient;
     private readonly HttpClient _httpClient;
     private readonly string _baseUrl = "https://www.pcgamingwiki.com/w/api.php";
 
-    public PCGWService()
+    static PCGWService()
     {
-        _httpClient = new HttpClient();
-        _httpClient.DefaultRequestHeaders.Add("User-Agent", "OpenTweak/1.0 (Automated Game Tweaks)");
+        SharedHttpClient = new HttpClient();
+        SharedHttpClient.DefaultRequestHeaders.Add("User-Agent", "OpenTweak/1.0 (Automated Game Tweaks)");
+    }
+
+    /// <summary>
+    /// Creates a new PCGWService using the shared HttpClient.
+    /// </summary>
+    public PCGWService() : this(SharedHttpClient)
+    {
+    }
+
+    /// <summary>
+    /// Creates a new PCGWService with a custom HttpClient (for testing).
+    /// </summary>
+    public PCGWService(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
     }
 
     #region Public API Methods

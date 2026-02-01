@@ -1,212 +1,234 @@
 # Distribution Guide
 
-This document outlines how to distribute OpenTweak as a signed, trusted application.
+This document outlines the distribution model for OpenTweak and explains how users can obtain the software.
 
 ---
 
 ## Overview
 
-OpenTweak follows a **source-available** model:
-- **Code**: Public on GitHub (PolyForm Shield License)
-- **Binary**: Signed executable for trust and convenience
+OpenTweak follows a **source-available, binary-commercial** model:
+
+| Aspect | Terms |
+|--------|-------|
+| **Source Code** | Public on GitHub — free to view, modify, and build for personal use |
+| **Pre-built Binaries** | Available exclusively through BuyMeACoffee — $25 USD |
+| **License** | PolyForm Shield with Commercial Distribution Addendum |
 
 ---
 
-## Code Signing Certificate
+## Obtaining OpenTweak
 
-### Why Sign?
+### Option 1: Build from Source (Free)
 
-Unsigned executables trigger Windows SmartScreen warnings:
-> "Windows protected your PC - Microsoft Defender SmartScreen prevented an unrecognized app from starting."
-
-Signed executables show:
-> "Verified Publisher: [Your Company Name]"
-
-### Certificate Options
-
-| Provider | Type | Cost | Validation Time |
-|----------|------|------|-----------------|
-| **Sectigo** | OV Code Signing | ~$200/year | 1-3 days |
-| **DigiCert** | OV Code Signing | ~$400/year | 1-3 days |
-| **SSL.com** | OV Code Signing | ~$130/year | 1-3 days |
-| **Certum** | OV Code Signing | ~$70/year | 1-3 days |
-
-### Recommendation
-
-**Certum Open Source Code Signing** (~$70/year) is the most cost-effective for open source projects.
-
-### Signing Process
-
-1. **Purchase certificate** from provider
-2. **Complete validation** (business registration, identity verification)
-3. **Receive USB token** or software certificate
-4. **Sign the executable**:
+You can build OpenTweak yourself at no cost:
 
 ```powershell
-# Using signtool (Windows SDK)
-signtool sign /f certificate.pfx /p password /tr http://timestamp.digicert.com /td sha256 /fd sha256 OpenTweak.exe
+# Clone the repository
+git clone https://github.com/nathanielopentweak/opentweak.git
+cd opentweak
 
-# Or using the GitHub Action (see below)
+# Build the project
+dotnet build OpenTweak.sln --configuration Release
+
+# Or publish a single-file executable
+dotnet publish OpenTweak/OpenTweak.csproj `
+  -c Release `
+  -r win-x64 `
+  --self-contained false `
+  -p:PublishSingleFile=true `
+  -o ./publish
 ```
 
----
+**Requirements:**
+- .NET 8.0 SDK
+- Windows 10/11
 
-## GitHub Actions Workflow
+### Option 2: Purchase Pre-built Binary ($25 USD)
 
-The repository includes [`.github/workflows/build.yml`](../.github/workflows/build.yml) which:
+For convenience, pre-built binaries are available:
 
-1. Builds the project on every push/PR
-2. Runs tests
-3. Publishes a single-file executable
-4. Creates GitHub Releases on version tags
+**Purchase Link:** https://buymeacoffee.com/opentweak
 
-### Adding Code Signing to CI/CD
+**What you get:**
+- Ready-to-run executable (no build needed)
+- Priority support via email/Discord
+- Future updates (within major version)
 
-To sign releases automatically, add these secrets to your GitHub repository:
-
-- `CERTIFICATE_PFX` - Base64-encoded PFX certificate
-- `CERTIFICATE_PASSWORD` - PFX password
-
-Then update the workflow:
-
-```yaml
-- name: Sign Executable
-  if: startsWith(github.ref, 'refs/tags/v')
-  run: |
-    $certBytes = [Convert]::FromBase64String("${{ secrets.CERTIFICATE_PFX }}")
-    [IO.File]::WriteAllBytes("certificate.pfx", $certBytes)
-    signtool sign /f certificate.pfx /p ${{ secrets.CERTIFICATE_PASSWORD }} /tr http://timestamp.digicert.com /td sha256 /fd sha256 ./publish/OpenTweak.exe
-```
+**Note:** The purchased binary is functionally identical to what you would build from source. You are paying for convenience and support, not additional features.
 
 ---
 
-## Distribution Channels
+## Why Charge for Binaries?
 
-### 1. GitHub Releases (Free)
+As a student developer, I cannot afford:
+- Code signing certificates ($70-400/year)
+- Extended validation processes
+- Enterprise infrastructure
 
-The CI/CD workflow automatically creates releases when you push a version tag:
+The $25 fee helps:
+1. Cover development time and tools
+2. Fund future improvements
+3. Provide priority support
+4. Keep the project sustainable
 
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-The workflow will:
-1. Build and sign the executable
-2. Create a GitHub Release
-3. Attach the signed binary
-
-### 2. Gumroad (Paid)
-
-For selling the signed binary:
-
-1. Create a Gumroad account
-2. Set up a product ($5-$10 suggested)
-3. Upload the signed executable
-4. Link to GitHub repository for source code
-
-**Product Description Template:**
-
-```
-OpenTweak - Transparent PC Game Optimization
-
-✅ Signed executable (no SmartScreen warnings)
-✅ Automatic updates
-✅ Priority support
-
-The source code is available at: https://github.com/yourusername/opentweak
-
-License: PolyForm Shield - You can read, modify, and build for personal use. Cannot sell or host competing service.
-```
-
-### 3. Microsoft Store (Optional)
-
-For wider distribution:
-
-1. Create a Microsoft Developer account ($19 one-time)
-2. Package as MSIX
-3. Submit to Microsoft Store
+The source code remains fully open — you are never forced to pay. Building from source is always free and fully supported.
 
 ---
 
-## Trust Factors
+## License Summary
 
-### For Users
+### What You CAN Do (Free)
 
-Include these in your README and website:
+- ✅ View and study the source code
+- ✅ Build and run for personal use
+- ✅ Modify for your own needs
+- ✅ Submit bug reports and feature requests
+- ✅ Fork for personal experimentation
 
-1. **GitHub Actions Build Logs** - Link to the workflow that built the exact binary
-2. **Certificate Details** - Show the signing certificate information
-3. **Source Code Availability** - Link to the public repository
-4. **VirusTotal Scan** - Link to scan results
+### What You CANNOT Do (Without Permission)
 
-### Example README Section
+- ❌ Distribute pre-built binaries
+- ❌ Offer automated build services that provide binaries to others
+- ❌ Include in package managers (winget, chocolatey, scoop)
+- ❌ Create competing products based on this code
+- ❌ Sell derivative works
 
-```markdown
-## Trust & Transparency
+### What Requires Purchase
 
-🔒 **Signed Binary**: This executable is signed with a code signing certificate
-📋 **Build Logs**: See exactly how this was built: [GitHub Actions](link)
-📖 **Open Source**: Full source code available: [GitHub](link)
-🛡️ **VirusTotal**: [Scan Results](link)
-```
-
----
-
-## Versioning Strategy
-
-Follow [Semantic Versioning](https://semver.org/):
-
-- **MAJOR**: Breaking changes (new config format, incompatible with old backups)
-- **MINOR**: New features (new launcher support, new UI features)
-- **PATCH**: Bug fixes (crash fixes, typo corrections)
-
-### Release Checklist
-
-- [ ] Update version in `OpenTweak.csproj`
-- [ ] Update `CHANGELOG.md`
-- [ ] Run full test suite
-- [ ] Build and sign executable
-- [ ] Create GitHub Release
-- [ ] Upload to Gumroad (if applicable)
-- [ ] Post on relevant forums (Reddit r/pcgaming, etc.)
+- 💰 Downloading pre-built executables ($25 via BuyMeACoffee)
 
 ---
 
-## Monetization Strategy
+## For Developers: Building from Source
 
-### The "Trust Premium"
+### Prerequisites
 
-Users pay for:
-1. **Convenience** - Pre-built signed executable
-2. **Trust** - Code signing certificate verification
-3. **Support** - Priority help with issues
+- Windows 10 or later
+- .NET 8.0 SDK or later
+- Visual Studio 2022 or VS Code (optional)
 
-### Free vs Paid
+### Build Steps
 
-| Feature | Free (Self-Build) | Paid (Signed Binary) |
-|---------|-------------------|----------------------|
-| Source Code | ✅ | ✅ |
-| Build Yourself | ✅ | ✅ |
-| Signed Executable | ❌ | ✅ |
-| Auto-Updates | ❌ | ✅ |
-| Support | Community | Priority |
+1. **Clone the repository:**
+   ```powershell
+   git clone https://github.com/nathanielopentweak/opentweak.git
+   ```
+
+2. **Restore dependencies:**
+   ```powershell
+   dotnet restore
+   ```
+
+3. **Build:**
+   ```powershell
+   dotnet build --configuration Release
+   ```
+
+4. **Run tests:**
+   ```powershell
+   dotnet test
+   ```
+
+5. **Publish (optional):**
+   ```powershell
+   dotnet publish OpenTweak/OpenTweak.csproj -c Release -r win-x64 -p:PublishSingleFile=true -o ./publish
+   ```
+
+The resulting executable will be in `./publish/OpenTweak.exe`.
 
 ---
 
-## Next Steps
+## CI/CD Policy
 
-1. **Purchase code signing certificate** (Certum recommended for cost)
-2. **Set up GitHub secrets** for CI/CD signing
-3. **Create Gumroad account** for distribution
-4. **Prepare release announcement** for Reddit/Discord
-5. **Monitor feedback** and iterate
+### GitHub Actions
+
+The repository includes automated workflows that:
+- Build the project on every push/PR
+- Run the test suite
+- Verify code quality
+
+**Important:** CI/CD workflows do NOT produce downloadable binaries. The build artifacts are used only for verification and are not persisted as releases.
+
+### Why No Free Binaries?
+
+Providing free binaries would:
+1. Undermine the sustainability model
+2. Violate the license terms for commercial distribution
+3. Create support burden without revenue
+
+Users who want binaries must purchase through the authorized channel (BuyMeACoffee).
 
 ---
 
-## Resources
+## Anti-Automation Clause
 
-- [Certum Open Source Code Signing](https://en.sklep.certum.pl/data-safety/code-signing-certificates/open-source-code-signing-on-a-token.html)
-- [Microsoft signtool documentation](https://docs.microsoft.com/en-us/windows/win32/seccrypto/signtool)
-- [GitHub Actions - Encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
-- [PolyForm Shield License](https://polyformproject.org/licenses/shield/1.0.0/)
+To protect the commercial model, the following are explicitly prohibited:
+
+### Prohibited Services
+
+Any service, platform, or automated system that:
+- Accepts OpenTweak source code as input
+- Automatically compiles/builds the software
+- Distributes or makes available the resulting binaries
+- Acts as a "build farm" or "CI-as-a-service" for OpenTweak
+
+### Examples of Prohibited Activities
+
+- Running a website where users paste source code and receive compiled binaries
+- Operating a Discord bot that builds and distributes executables
+- Creating GitHub Actions workflows that publish binaries to releases
+- Offering OpenTweak builds through package managers
+
+### Permitted Activities
+
+- Building for your own personal use
+- Building within your organization for internal use
+- CI/CD for development/testing (without binary distribution)
+- Educational demonstrations of build processes
+
+---
+
+## Enforcement
+
+Violations of the distribution terms will be handled as follows:
+
+1. **First Contact:** Written notice requesting compliance
+2. **Compliance Period:** 32 days to cease prohibited activity
+3. **Escalation:** If not resolved, license termination and potential legal action
+
+---
+
+## Frequently Asked Questions
+
+### Q: Can I build this for my friend?
+
+You can help your friend build it on their machine, but you cannot give them a pre-built binary. They must build it themselves or purchase a license.
+
+### Q: Can I include this in my company's internal tools?
+
+Yes, building from source for internal company use is permitted. You cannot distribute the binary outside your organization.
+
+### Q: What if I can't afford $25?
+
+Build from source — it's free and fully functional. The fee is only for convenience, not access.
+
+### Q: Can I fork this and distribute my own binaries?
+
+No. Forks must also comply with the license terms. You cannot distribute binaries of derivative works either.
+
+### Q: Will there ever be free binaries?
+
+No. The source-available/binary-commercial model is fundamental to the project's sustainability.
+
+---
+
+## Contact
+
+For distribution inquiries or licensing questions:
+
+- **GitHub Issues:** https://github.com/nathanielopentweak/opentweak/issues
+- **BuyMeACoffee:** https://buymeacoffee.com/opentweak
+
+---
+
+*Last updated: 2025-02-01*

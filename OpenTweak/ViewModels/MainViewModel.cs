@@ -1,3 +1,8 @@
+// OpenTweak - PC Game Optimization Tool
+// Copyright 2024-2025 OpenTweak Contributors
+// Licensed under PolyForm Shield License 1.0.0
+// See LICENSE.md for full terms.
+
 using System.IO;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -53,7 +58,7 @@ public partial class MainViewModel : ObservableObject
     public MainViewModel()
     {
         _gameScanner = new GameScanner();
-        _databaseService = new DatabaseService();
+        _databaseService = DatabaseService.Instance;
         _pcgwService = new PCGWService();
 
         // Load cached games on startup
