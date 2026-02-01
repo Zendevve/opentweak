@@ -1,261 +1,422 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using OpenTweak.Models;
 
 namespace OpenTweak.Services;
 
 /// <summary>
-/// Service for fetching game data from PCGamingWiki using the Cargo API.
-/// Uses structured queries instead of HTML scraping for reliability.
+/// Service for interacting with PCGamingWiki API and data.
+/// This is the "Twiki-Killer" - extracting actual fix instructions from wiki pages.
 /// </summary>
 public class PCGWService
 {
     private readonly HttpClient _httpClient;
-    private const string BaseUrl = "https://www.pcgamingwiki.com/w/api.php";
+    private readonly string _baseUrl = "https://www.pcgamingwiki.com/w/api.php";
 
     public PCGWService()
     {
         _httpClient = new HttpClient();
-        _httpClient.DefaultRequestHeaders.Add("User-Agent", "OpenTweak/1.0 (https://github.com/your-repo)");
+        _httpClient.DefaultRequestHeaders.Add("User-Agent", "OpenTweak/1.0 (Automated Game Tweaks)");
     }
 
-    /// <summary>
-    /// Fetches all available tweak recipes for a game from PCGW.
-    /// </summary>
-    public async Task<List<TweakRecipe>> GetTweaksForGameAsync(string gameTitle, Guid gameId)
-    {
-        var recipes = new List<TweakRecipe>();
-
-        // Fetch from different settings tables
-        var videoSettings = await QueryCargoTableAsync("Video_settings", gameTitle);
-        var audioSettings = await QueryCargoTableAsync("Audio_settings", gameTitle);
-        var inputSettings = await QueryCargoTableAsync("Input_settings", gameTitle);
-
-        recipes.AddRange(ParseVideoSettings(videoSettings, gameId, gameTitle));
-        recipes.AddRange(ParseAudioSettings(audioSettings, gameId, gameTitle));
-        recipes.AddRange(ParseInputSettings(inputSettings, gameId, gameTitle));
-
-        return recipes;
-    }
+    #region Public API Methods
 
     /// <summary>
-    /// Queries a PCGW Cargo table for a specific game.
+    /// Searches for a game on PCGamingWiki and returns basic info.
     /// </summary>
-    private async Task<JsonDocument?> QueryCargoTableAsync(string table, string gameTitle)
+    public async Task<PCGWGameInfo?> SearchGameAsync(string gameTitle)
     {
         try
         {
-            // Build Cargo API query
-            var fields = table switch
+            // Search for the game
+            var searchUrl = $"{_baseUrl}?action=query&list=search&srsearch={Uri.EscapeDataString(gameTitle)}&format=json&srlimit=5";
+            var searchResponse = await _httpClient.GetStringAsync(searchUrl);
+            var searchData = JsonSerializer.Deserialize<JsonElement>(searchResponse);
+
+            if (!searchData.TryGetProperty("query", out var query) ||
+                !query.TryGetProperty("search", out var searchResults))
             {
-                "Video_settings" => "Page,Widescreen,Multi-monitor,Ultra-widescreen,4K_Ultra_HD,HDR,Windowed,Borderless_fullscreen,Anisotropic_filtering,Anti-aliasing,V-sync,60_FPS,120_FPS,Uncapped_FPS",
-                "Audio_settings" => "Page,Separate_volume_controls,Surround_sound,Subtitles,Closed_captions,Mute_on_focus_lost",
-                "Input_settings" => "Page,Remappable_controls,Controller_support,Full_controller_support,Controller_types,Input_prompt_override,Haptic_feedback,Touchscreen,Keyboard_and_mouse_on_consoles",
-                _ => "Page"
-            };
+                return null;
+            }
 
-            var url = $"{BaseUrl}?action=cargoquery" +
-                      $"&tables={Uri.EscapeDataString(table)}" +
-                      $"&fields={Uri.EscapeDataString(fields)}" +
-                      $"&where={Uri.EscapeDataString($"Page='{EscapeWikiTitle(gameTitle)}'")}"+
-                      "&format=json";
+            // Find the best match
+            foreach (var result in searchResults.EnumerateArray())
+            {
+                var title = result.GetProperty("title").GetString();
+                if (string.IsNullOrEmpty(title)) continue;
 
-            var response = await _httpClient.GetStringAsync(url);
-            return JsonDocument.Parse(response);
+                // Check if it's a game page (not a category or file)
+                if (!title.StartsWith("Category:") && !title.StartsWith("File:"))
+                {
+                    // Get full page content
+                    var pageInfo = await GetPageContentAsync(title);
+                    if (pageInfo != null)
+                    {
+                        return pageInfo;
+                    }
+                }
+            }
+
+            return null;
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"PCGW query error for {table}: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Error searching PCGW: {ex.Message}");
             return null;
         }
     }
 
     /// <summary>
-    /// Searches PCGW for games matching a query.
+    /// Gets detailed information about a game including all fix instructions.
     /// </summary>
-    public async Task<List<string>> SearchGamesAsync(string query)
+    public async Task<PCGWGameInfo?> GetPageContentAsync(string pageTitle)
     {
-        var results = new List<string>();
-
         try
         {
-            var url = $"{BaseUrl}?action=opensearch&search={Uri.EscapeDataString(query)}&limit=10&namespace=0&format=json";
-            var response = await _httpClient.GetStringAsync(url);
+            // Get the wiki page content
+            var contentUrl = $"{_baseUrl}?action=parse&page={Uri.EscapeDataString(pageTitle)}&prop=wikitext&format=json";
+            var contentResponse = await _httpClient.GetStringAsync(contentUrl);
+            var contentData = JsonSerializer.Deserialize<JsonElement>(contentResponse);
 
-            using var doc = JsonDocument.Parse(response);
-            var root = doc.RootElement;
-
-            if (root.GetArrayLength() > 1)
+            if (!contentData.TryGetProperty("parse", out var parse) ||
+                !parse.TryGetProperty("wikitext", out var wikitext))
             {
-                var titles = root[1];
-                foreach (var title in titles.EnumerateArray())
-                {
-                    var titleStr = title.GetString();
-                    if (!string.IsNullOrEmpty(titleStr))
-                        results.Add(titleStr);
-                }
+                return null;
             }
+
+            var wikiText = wikitext.GetString();
+            if (string.IsNullOrEmpty(wikiText))
+            {
+                return null;
+            }
+
+            // Extract game information
+            var gameInfo = new PCGWGameInfo
+            {
+                Title = pageTitle,
+                WikiUrl = $"https://www.pcgamingwiki.com/wiki/{Uri.EscapeDataString(pageTitle.Replace(" ", "_"))}",
+                ConfigFiles = ExtractConfigFilePaths(wikiText),
+                SaveGameLocations = ExtractSaveGamePaths(wikiText),
+                AvailableTweaks = new List<TweakRecipe>()
+            };
+
+            // Extract actual fix instructions from the wiki text
+            var recipes = ExtractRecipesFromWikiText(wikiText, Guid.NewGuid(), gameInfo.Title);
+            gameInfo.AvailableTweaks.AddRange(recipes);
+
+            return gameInfo;
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"PCGW search error: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Error getting PCGW page content: {ex.Message}");
+            return null;
         }
-
-        return results;
     }
 
-    #region Settings Parsers
-
-    private List<TweakRecipe> ParseVideoSettings(JsonDocument? doc, Guid gameId, string gameTitle)
+    /// <summary>
+    /// Gets available tweaks for a specific game.
+    /// </summary>
+    public async Task<List<TweakRecipe>> GetAvailableTweaksAsync(string gameTitle, Guid gameId)
     {
-        var recipes = new List<TweakRecipe>();
-        if (doc == null) return recipes;
+        var gameInfo = await SearchGameAsync(gameTitle);
+        if (gameInfo?.AvailableTweaks == null)
+        {
+            return new List<TweakRecipe>();
+        }
+
+        // Update the GameId in all recipes
+        foreach (var tweak in gameInfo.AvailableTweaks)
+        {
+            tweak.GameId = gameId;
+        }
+
+        return gameInfo.AvailableTweaks;
+    }
+
+    #endregion
+
+    #region Data Extraction Methods
+
+    /// <summary>
+    /// Extracts configuration file paths from wiki text.
+    /// </summary>
+    private List<string> ExtractConfigFilePaths(string wikiText)
+    {
+        var paths = new List<string>();
 
         try
         {
-            var cargoQuery = doc.RootElement.GetProperty("cargoquery");
-            foreach (var item in cargoQuery.EnumerateArray())
+            // Look for configuration file paths in the wiki text
+            // Common patterns in PCGamingWiki
+            var configPatterns = new[]
             {
-                var title = item.GetProperty("title");
+                @"Configuration file\(s\) location.*?({{.*?}})",
+                @"{{Game data/config\\|([^}]+)}}",
+                @"{{p\\|game}}[/\\]([^\s\n]+\.(?:ini|cfg|conf|xml|json|yaml|yml))",
+                @"{{p\\|hkcu}}[/\\]([^\s\n]+)",
+                @"{{p\\|hklm}}[/\\]([^\s\n]+)",
+                @"{{p\\|appdata}}[/\\]([^\s\n]+)",
+                @"{{p\\|userprofile\\documents}}[/\\]([^\s\n]+)"
+            };
 
-                // Check for common video fixes
-                AddVideoTweakIfNeeded(recipes, gameId, gameTitle, title, "Uncapped FPS", "60_FPS", "120_FPS", "Uncapped FPS");
-                AddVideoTweakIfNeeded(recipes, gameId, gameTitle, title, "Ultrawide Support", "Ultra-widescreen");
-                AddVideoTweakIfNeeded(recipes, gameId, gameTitle, title, "Borderless Fullscreen", "Borderless fullscreen");
-            }
-        }
-        catch { }
-
-        return recipes;
-    }
-
-    private List<TweakRecipe> ParseAudioSettings(JsonDocument? doc, Guid gameId, string gameTitle)
-    {
-        var recipes = new List<TweakRecipe>();
-        if (doc == null) return recipes;
-
-        try
-        {
-            var cargoQuery = doc.RootElement.GetProperty("cargoquery");
-            foreach (var item in cargoQuery.EnumerateArray())
+            foreach (var pattern in configPatterns)
             {
-                var title = item.GetProperty("title");
-
-                // Check for common audio fixes
-                AddAudioTweakIfNeeded(recipes, gameId, gameTitle, title, "Surround Sound", "Surround sound");
-            }
-        }
-        catch { }
-
-        return recipes;
-    }
-
-    private List<TweakRecipe> ParseInputSettings(JsonDocument? doc, Guid gameId, string gameTitle)
-    {
-        var recipes = new List<TweakRecipe>();
-        if (doc == null) return recipes;
-
-        try
-        {
-            var cargoQuery = doc.RootElement.GetProperty("cargoquery");
-            foreach (var item in cargoQuery.EnumerateArray())
-            {
-                var title = item.GetProperty("title");
-
-                // Check for controller support status
-                if (TryGetProperty(title, "Controller support", out var controllerSupport))
+                var matches = Regex.Matches(wikiText, pattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
+                foreach (Match match in matches)
                 {
-                    if (controllerSupport == "false" || controllerSupport == "limited")
+                    if (match.Groups.Count > 1)
                     {
-                        recipes.Add(new TweakRecipe
+                        var path = match.Groups[1].Value.Trim();
+                        if (!string.IsNullOrEmpty(path) && !paths.Contains(path))
                         {
-                            GameId = gameId,
-                            Category = TweakCategory.Input,
-                            Description = "Controller support may require additional configuration",
-                            RiskLevel = "Low",
-                            SourceUrl = $"https://www.pcgamingwiki.com/wiki/{Uri.EscapeDataString(gameTitle)}"
-                        });
+                            paths.Add(path);
+                        }
+                    }
+                }
+            }
+
+            // Also look for explicit file paths mentioned in the text
+            var filePathPattern = @"([A-Za-z]:\\[^\n\r]*\.(?:ini|cfg|conf|xml|json|yaml|yml))";
+            var fileMatches = Regex.Matches(wikiText, filePathPattern, RegexOptions.IgnoreCase);
+            foreach (Match match in fileMatches)
+            {
+                var path = match.Value;
+                if (!paths.Contains(path))
+                {
+                    paths.Add(path);
+                }
+            }
+        }
+        catch { }
+
+        return paths;
+    }
+
+    /// <summary>
+    /// Extracts save game locations from wiki text.
+    /// </summary>
+    private List<string> ExtractSaveGamePaths(string wikiText)
+    {
+        var paths = new List<string>();
+
+        try
+        {
+            // Look for save game location patterns
+            var savePatterns = new[]
+            {
+                @"Save game cloud syncing.*?({{.*?}})",
+                @"{{Game data/saves\\|([^}]+)}}",
+                @"{{p\\|appdata}}[/\\]([^\s\n]+)",
+                @"{{p\\|userprofile\\documents}}[/\\]([^\s\n]+)",
+                @"{{p\\|game}}[/\\]([^\s\n]+save[^\s\n]*)"
+            };
+
+            foreach (var pattern in savePatterns)
+            {
+                var matches = Regex.Matches(wikiText, pattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
+                foreach (Match match in matches)
+                {
+                    if (match.Groups.Count > 1)
+                    {
+                        var path = match.Groups[1].Value.Trim();
+                        if (!string.IsNullOrEmpty(path) && !paths.Contains(path))
+                        {
+                            paths.Add(path);
+                        }
                     }
                 }
             }
         }
         catch { }
 
+        return paths;
+    }
+
+    #endregion
+
+    #region Wiki Text Recipe Extraction
+
+    /// <summary>
+    /// Extracts specific fix instructions from wiki page content.
+    /// This is the "Twiki-Killer" feature - parsing actual fix instructions.
+    /// </summary>
+    private List<TweakRecipe> ExtractRecipesFromWikiText(string wikiText, Guid gameId, string gameTitle)
+    {
+        var recipes = new List<TweakRecipe>();
+
+        // Look for fix instructions in various formats
+        recipes.AddRange(ExtractIniFixes(wikiText, gameId, gameTitle));
+        recipes.AddRange(ExtractRegistryFixes(wikiText, gameId, gameTitle));
+        recipes.AddRange(ExtractCommandLineFixes(wikiText, gameId, gameTitle));
+
+        return recipes;
+    }
+
+    /// <summary>
+    /// Extracts INI/CFG file modifications from wiki text.
+    /// </summary>
+    private List<TweakRecipe> ExtractIniFixes(string wikiText, Guid gameId, string gameTitle)
+    {
+        var recipes = new List<TweakRecipe>();
+
+        // Pattern: Look for code blocks or preformatted text with INI-style content
+        var iniPattern = @"(?:Edit|Modify|Change|Set)\b\s*(?:the\s*)?(?:following\s*)?(?:in\s*)?(?:the\s*)?(?:file\s*)?`?([^`\n]+\.(?:ini|cfg|conf))`?[^\n]*\n*(?:.*?)\[([^\]]+)\]?\s*([\w_]+)\s*=\s*([^\n]+)";
+
+        var matches = Regex.Matches(wikiText, iniPattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
+
+        foreach (Match match in matches)
+        {
+            var filePath = match.Groups[1].Value.Trim();
+            var section = match.Groups[2].Success ? match.Groups[2].Value.Trim() : null;
+            var key = match.Groups[3].Value.Trim();
+            var value = match.Groups[4].Value.Trim();
+
+            recipes.Add(new TweakRecipe
+            {
+                GameId = gameId,
+                Category = TweakCategory.Other,
+                Description = $"Set {key}={value} in {Path.GetFileName(filePath)}",
+                TargetType = TweakTargetType.IniFile,
+                FilePath = filePath,
+                Section = section,
+                Key = key,
+                Value = value,
+                RiskLevel = "Medium",
+                SourceUrl = $"https://www.pcgamingwiki.com/wiki/{Uri.EscapeDataString(gameTitle)}"
+            });
+        }
+
+        // Alternative pattern: Look for preformatted code blocks
+        var codeBlockPattern = @"<pre>(.*?)</pre>";
+        var codeMatches = Regex.Matches(wikiText, codeBlockPattern, RegexOptions.Singleline);
+
+        foreach (Match match in codeMatches)
+        {
+            var content = match.Groups[1].Value;
+
+            // Check if it looks like an INI file
+            if (content.Contains("=") && (content.Contains("[") || content.Contains("]")))
+            {
+                var lines = content.Split('\n');
+                string? currentSection = null;
+
+                foreach (var line in lines)
+                {
+                    var trimmedLine = line.Trim();
+
+                    // Check for section header
+                    var sectionMatch = Regex.Match(trimmedLine, @"^\[([^\]]+)\]$");
+                    if (sectionMatch.Success)
+                    {
+                        currentSection = sectionMatch.Groups[1].Value;
+                        continue;
+                    }
+
+                    // Check for key=value pair
+                    var kvMatch = Regex.Match(trimmedLine, @"^([\w_]+)\s*=\s*(.+)$");
+                    if (kvMatch.Success && currentSection != null)
+                    {
+                        var key = kvMatch.Groups[1].Value.Trim();
+                        var value = kvMatch.Groups[2].Value.Trim();
+
+                        recipes.Add(new TweakRecipe
+                        {
+                            GameId = gameId,
+                            Category = TweakCategory.Other,
+                            Description = $"Set {key}={value} in config file",
+                            TargetType = TweakTargetType.IniFile,
+                            Section = currentSection,
+                            Key = key,
+                            Value = value,
+                            RiskLevel = "Medium",
+                            SourceUrl = $"https://www.pcgamingwiki.com/wiki/{Uri.EscapeDataString(gameTitle)}"
+                        });
+                    }
+                }
+            }
+        }
+
+        return recipes;
+    }
+
+    /// <summary>
+    /// Extracts registry modifications from wiki text.
+    /// </summary>
+    private List<TweakRecipe> ExtractRegistryFixes(string wikiText, Guid gameId, string gameTitle)
+    {
+        var recipes = new List<TweakRecipe>();
+
+        // Pattern for registry edits
+        var regPattern = @"(?:Registry|regedit).*?(?:path|key)[:=]*\s*[``""']?(HKEY_[^``""'\n]+)[``""']?[^\n]*(?:value|name)[:=]*\s*[``""']?([\w_]+)[``""']?[^\n]*(?:data|value)[:=]*\s*[``""']?([^``""'\n]+)[``""']?";
+
+        var matches = Regex.Matches(wikiText, regPattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
+
+        foreach (Match match in matches)
+        {
+            recipes.Add(new TweakRecipe
+            {
+                GameId = gameId,
+                Category = TweakCategory.Other,
+                Description = $"Registry modification: {match.Groups[2].Value}",
+                TargetType = TweakTargetType.Registry,
+                FilePath = match.Groups[1].Value,
+                Key = match.Groups[2].Value,
+                Value = match.Groups[3].Value.Trim(),
+                RiskLevel = "High",
+                SourceUrl = $"https://www.pcgamingwiki.com/wiki/{Uri.EscapeDataString(gameTitle)}"
+            });
+        }
+
+        return recipes;
+    }
+
+    /// <summary>
+    /// Extracts command-line arguments and launch options.
+    /// </summary>
+    private List<TweakRecipe> ExtractCommandLineFixes(string wikiText, Guid gameId, string gameTitle)
+    {
+        var recipes = new List<TweakRecipe>();
+
+        // Pattern for command-line arguments
+        var cmdPattern = @"(?:command.?line|launch option|argument).*?(?:add|use|set)\s*[`""']?(-[\w-]+)[`""']?";
+
+        var matches = Regex.Matches(wikiText, cmdPattern, RegexOptions.IgnoreCase);
+
+        foreach (Match match in matches)
+        {
+            recipes.Add(new TweakRecipe
+            {
+                GameId = gameId,
+                Category = TweakCategory.Other,
+                Description = $"Launch option: {match.Groups[1].Value}",
+                TargetType = TweakTargetType.Other,
+                Key = "LaunchOptions",
+                Value = match.Groups[1].Value,
+                RiskLevel = "Low",
+                SourceUrl = $"https://www.pcgamingwiki.com/wiki/{Uri.EscapeDataString(gameTitle)}"
+            });
+        }
+
         return recipes;
     }
 
     #endregion
+}
 
-    #region Helper Methods
-
-    private void AddVideoTweakIfNeeded(List<TweakRecipe> recipes, Guid gameId, string gameTitle,
-        JsonElement title, string description, params string[] properties)
-    {
-        foreach (var prop in properties)
-        {
-            if (TryGetProperty(title, prop, out var value))
-            {
-                if (value == "hackable" || value == "limited")
-                {
-                    recipes.Add(new TweakRecipe
-                    {
-                        GameId = gameId,
-                        Category = TweakCategory.Video,
-                        Description = $"{description}: Requires configuration tweak",
-                        RiskLevel = "Medium",
-                        SourceUrl = $"https://www.pcgamingwiki.com/wiki/{Uri.EscapeDataString(gameTitle)}"
-                    });
-                    return;
-                }
-            }
-        }
-    }
-
-    private void AddAudioTweakIfNeeded(List<TweakRecipe> recipes, Guid gameId, string gameTitle,
-        JsonElement title, string description, params string[] properties)
-    {
-        foreach (var prop in properties)
-        {
-            if (TryGetProperty(title, prop, out var value))
-            {
-                if (value == "hackable" || value == "limited")
-                {
-                    recipes.Add(new TweakRecipe
-                    {
-                        GameId = gameId,
-                        Category = TweakCategory.Audio,
-                        Description = $"{description}: Requires configuration tweak",
-                        RiskLevel = "Low",
-                        SourceUrl = $"https://www.pcgamingwiki.com/wiki/{Uri.EscapeDataString(gameTitle)}"
-                    });
-                    return;
-                }
-            }
-        }
-    }
-
-    private bool TryGetProperty(JsonElement element, string propertyName, out string value)
-    {
-        value = string.Empty;
-
-        // Normalize property name for JSON (spaces to underscores, etc.)
-        var normalizedName = propertyName.Replace(" ", "_").Replace("-", "_");
-
-        if (element.TryGetProperty(normalizedName, out var prop))
-        {
-            value = prop.GetString() ?? string.Empty;
-            return !string.IsNullOrEmpty(value);
-        }
-
-        return false;
-    }
-
-    private string EscapeWikiTitle(string title)
-    {
-        // Escape single quotes for SQL-like where clause
-        return title.Replace("'", "''");
-    }
-
-    #endregion
+/// <summary>
+/// Represents game information from PCGamingWiki.
+/// </summary>
+public class PCGWGameInfo
+{
+    public string Title { get; set; } = string.Empty;
+    public string WikiUrl { get; set; } = string.Empty;
+    public List<string> ConfigFiles { get; set; } = new();
+    public List<string> SaveGameLocations { get; set; } = new();
+    public List<TweakRecipe> AvailableTweaks { get; set; } = new();
 }

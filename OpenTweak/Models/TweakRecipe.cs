@@ -21,7 +21,8 @@ public enum TweakTargetType
     CfgFile,
     XmlFile,
     JsonFile,
-    Registry
+    Registry,
+    Other
 }
 
 /// <summary>

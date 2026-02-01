@@ -1,122 +1,204 @@
 # Architecture Overview
 
-> TEMPLATE ONLY — remove this note and replace all placeholder text before saving as a real `docs/Architecture/Overview.md`.
+**System:** OpenTweak - Transparent PC game optimization tool
+**Stack:** C# / .NET 8 / WPF / WPFUI / LiteDB
+**Entry Point:** [`OpenTweak/App.xaml.cs`](../../OpenTweak/App.xaml.cs) → [`MainWindow.xaml`](../../OpenTweak/Views/MainWindow.xaml)
 
-Goal: in ~5 minutes, understand **what exists**, **where it lives**, and **how modules interact**.
+---
 
-This file is the primary “start here” card for humans and AI agents.
+## Summary
 
-Single source of truth: keep this doc navigational and coarse (diagrams + links). Detailed behaviour belongs in `docs/Features/*`; detailed decisions/invariants belong in `docs/ADR/*`.
+OpenTweak scans for installed games across multiple launchers, fetches tweak recipes from PCGamingWiki, and safely applies configuration changes with automatic backup and restore capabilities.
 
-## Summary (keep it short)
+- **Where is the code:** [`OpenTweak/`](../../OpenTweak/)
+- **Entry points:** [`App.xaml.cs`](../../OpenTweak/App.xaml.cs), [`MainWindow.xaml`](../../OpenTweak/Views/MainWindow.xaml)
+- **Dependencies:** WPF-UI, LiteDB, Salaros.ConfigParser, CommunityToolkit.Mvvm
 
-- **System:**  
-- **Where is the code:**  
-- **Entry points:**  
-- **Dependencies:**  
+---
 
-## Scoping (read first)
+## Scoping
 
-- **In scope:** …
-- **Out of scope:** …
-- Pick impacted module(s) from the diagram + module index (with links).
-- Pick entry point(s): API / UI / CLI / job / event.
-- Read only: linked ADR/Feature doc(s) → entry-point file(s) → minimum dependencies.
-- Stop if scope can’t be mapped to this doc → update this doc (or ask 1 clarifying question).
+**In scope:**
+- Game discovery from Steam, Epic, GOG, Xbox, Manual
+- PCGamingWiki Cargo API integration
+- Config file modification (INI, CFG, JSON, XML, Registry)
+- Automatic backup and restore
+- Windows 11 WPF UI with Mica backdrop
 
-## 2) Diagrams (Mermaid) — primary context
+**Out of scope:**
+- Game installation/management
+- Online multiplayer modifications
+- Cheat/hack detection bypass
 
-> TEMPLATE ONLY — this file is the main context tool. Keep these diagrams up to date.  
-> Diagrams are for humans and AI agents. They must be self-describing.  
-> Model real blocks/modules/interfaces and **key** classes/types (not every file). Add dependencies only if they exist.  
-> Every diagram element must be anchored via real, clickable Markdown links in the indexes below (feature docs, ADRs, code paths, entry-point files).  
-> From `docs/Architecture/Overview.md`, code links usually start with `../../` (two levels up to repo root).  
-> If a diagram becomes a messy “spaghetti graph”, it is incorrect: split by boundary and keep each diagram readable.  
-> Remove this note in the real doc.
+---
 
-### 2.1 System / module map (blocks + modules)
+## Diagrams
 
-> Use real module/service names as node labels. Every node must have a matching entry in “Navigation index” (with real links).
+### System / Module Map
+
+```mermaid
+flowchart TB
+    subgraph UI["Presentation Layer"]
+        MW[MainWindow]
+        GDV[GameDetailView]
+        MVM[MainViewModel]
+        GDVM[GameDetailViewModel]
+    end
+
+    subgraph Services["Service Layer"]
+        GS[GameScanner]
+        PCGW[PCGWService]
+        TE[TweakEngine]
+        BS[BackupService]
+        DBS[DatabaseService]
+    end
+
+    subgraph Models["Model Layer"]
+        G[Game]
+        TR[TweakRecipe]
+        S[Snapshot]
+    end
+
+    subgraph External["External Systems"]
+        PCGW_API[PCGamingWiki API]
+        Steam[Steam Registry/VDF]
+        Epic[Epic Manifests]
+        GOG[GOG Registry]
+        Xbox[Xbox Game Pass]
+        Files[Config Files]
+        Reg[Windows Registry]
+    end
+
+    MW --> MVM
+    GDV --> GDVM
+    MVM --> GS
+    MVM --> DBS
+    GDVM --> PCGW
+    GDVM --> TE
+    GDVM --> BS
+    GS --> Steam
+    GS --> Epic
+    GS --> GOG
+    GS --> Xbox
+    PCGW --> PCGW_API
+    TE --> BS
+    TE --> Files
+    TE --> Reg
+    BS --> Files
+    DBS --> G
+    DBS --> TR
+    DBS --> S
+```
+
+### Interfaces / Contracts Map
 
 ```mermaid
 flowchart LR
-  EP[Entry Points]
-  A[Module A]
-  B[Module B]
+    subgraph UI["UI"]
+        Commands[ICommand bindings]
+        INPC[INotifyPropertyChanged]
+    end
 
-  EP --> A
-  A --> B
+    subgraph Services["Services"]
+        GS_API[ScanAllLaunchersAsync]
+        PCGW_API[GetTweaksForGameAsync]
+        TE_API[ApplyTweaksAsync PreviewTweaksAsync]
+        BS_API[CreateSnapshotAsync RestoreSnapshotAsync]
+    end
+
+    subgraph External["External"]
+        Cargo[Cargo API]
+        Wiki[Wiki Parse API]
+        Files[File System]
+        Reg[Registry]
+    end
+
+    UI --Commands--> Services
+    UI --INPC--> UI
+    PCGW_API --HTTP--> Cargo
+    PCGW_API --HTTP--> Wiki
+    TE_API --> Files
+    TE_API --> Reg
+    BS_API --> Files
 ```
 
-### 2.2 Interfaces / contracts map (how modules talk)
-
-> Show contracts between modules: HTTP endpoints, events, queues, interfaces/ports, file formats. Every contract must have a matching entry in “Navigation index” with a source-of-truth link.
+### Key Classes / Types Map
 
 ```mermaid
-flowchart LR
-  A[Module A]
-  P((Port / Interface))
-  B[Module B]
-  E[[Event: SomethingHappened]]
+flowchart TB
+    subgraph Models
+        G[Game]
+        TR[TweakRecipe]
+        S[Snapshot]
+        LT[LauncherType enum]
+        TC[TweakCategory enum]
+        TTT[TweakTargetType enum]
+    end
 
-  A --calls--> P
-  P --> B
-  A --emits--> E
-  B --subscribes--> E
+    subgraph Services
+        GS[GameScanner]
+        PCGW[PCGWService]
+        TE[TweakEngine]
+        BS[BackupService]
+    end
+
+    subgraph ViewModels
+        MVM[MainViewModel]
+        GDVM[GameDetailViewModel]
+    end
+
+    GS --> G
+    PCGW --> TR
+    TE --> TR
+    TE --> S
+    BS --> S
+    MVM --> G
+    GDVM --> TR
+    GDVM --> S
 ```
 
-### 2.3 Key classes / types map (main classes and relationships)
+---
 
-> If `classDiagram` is flaky in your renderer, replace it with a `flowchart` that shows the same relationships.
-> Use real type names. Every type shown here must appear in “Key classes / types” with a link to where it is defined.
+## Navigation Index
 
-```mermaid
-classDiagram
-  class ServiceA
-  class IRepoA
-  class RepoA
-  class EntityA
+### Modules
 
-  ServiceA --> IRepoA : uses
-  IRepoA <|.. RepoA : implements
-  ServiceA --> EntityA : creates/updates
-```
+| Module | Code | Entry Points | Description |
+|--------|------|--------------|-------------|
+| **Views** | [`OpenTweak/Views/`](../../OpenTweak/Views/) | [`MainWindow.xaml`](../../OpenTweak/Views/MainWindow.xaml), [`GameDetailView.xaml`](../../OpenTweak/Views/GameDetailView.xaml) | WPF UI with WPFUI styling |
+| **ViewModels** | [`OpenTweak/ViewModels/`](../../OpenTweak/ViewModels/) | [`MainViewModel.cs`](../../OpenTweak/ViewModels/MainViewModel.cs), [`GameDetailViewModel.cs`](../../OpenTweak/ViewModels/GameDetailViewModel.cs) | MVVM logic with CommunityToolkit |
+| **Services** | [`OpenTweak/Services/`](../../OpenTweak/Services/) | [`GameScanner.cs`](../../OpenTweak/Services/GameScanner.cs), [`PCGWService.cs`](../../OpenTweak/Services/PCGWService.cs), [`TweakEngine.cs`](../../OpenTweak/Services/TweakEngine.cs), [`BackupService.cs`](../../OpenTweak/Services/BackupService.cs) | Core business logic |
+| **Models** | [`OpenTweak/Models/`](../../OpenTweak/Models/) | [`Game.cs`](../../OpenTweak/Models/Game.cs), [`TweakRecipe.cs`](../../OpenTweak/Models/TweakRecipe.cs), [`Snapshot.cs`](../../OpenTweak/Models/Snapshot.cs) | Data models |
 
-## 3) Navigation index (required, keep it tiny)
+### Key Classes / Types
 
-> This replaces “tables as inventories”. Keep it high-signal and short.  
-> Goal: an agent can jump from any diagram element to the right docs/code without repo-wide scanning.
+| Type | Definition | Description |
+|------|------------|-------------|
+| [`Game`](../../OpenTweak/Models/Game.cs) | Model | Represents a detected game with metadata |
+| [`TweakRecipe`](../../OpenTweak/Models/TweakRecipe.cs) | Model | Deterministic tweak from PCGW |
+| [`Snapshot`](../../OpenTweak/Models/Snapshot.cs) | Model | Backup snapshot metadata |
+| [`GameScanner`](../../OpenTweak/Services/GameScanner.cs) | Service | Multi-launcher game discovery |
+| [`PCGWService`](../../OpenTweak/Services/PCGWService.cs) | Service | PCGamingWiki Cargo API client |
+| [`TweakEngine`](../../OpenTweak/Services/TweakEngine.cs) | Service | Safe config modification with preview |
+| [`BackupService`](../../OpenTweak/Services/BackupService.cs) | Service | File backup and restore |
+| [`MainViewModel`](../../OpenTweak/ViewModels/MainViewModel.cs) | ViewModel | Main window state and commands |
 
-### 3.1 Modules (diagram nodes)
+### External Contracts
 
-- `ModuleName` — code: [path/to/module/](../../path/to/module/); entry points: [path/to/entrypoint](../../path/to/entrypoint); docs: [docs/Features/...](../Features/...) / [docs/ADR/...](../ADR/...)
+| Contract | Type | Source | Description |
+|----------|------|--------|-------------|
+| PCGW Cargo API | HTTP/JSON | PCGamingWiki | Structured game settings queries |
+| PCGW Parse API | HTTP/JSON | PCGamingWiki | Wiki page content for fix extraction |
+| Steam VDF | File | `%SteamPath%` | Library and game manifests |
+| Epic Manifest | JSON | `%ProgramData%\Epic` | Game installation metadata |
+| GOG Registry | Registry | `HKLM\SOFTWARE\GOG.com` | Game installation paths |
 
-### 3.2 Interfaces / contracts (diagram edges)
+---
 
-- `ContractName` (HTTP/event/queue/interface) — source of truth: [path/to/api-or-contract](../../path/to/api-or-contract); producer/caller: ModuleA; consumer: ModuleB; docs: [docs/ADR/...](../ADR/...)
+## Data Flow
 
-### 3.3 Key classes / types (optional, high-signal only)
-
-> Include only cross-module/public types that matter for understanding and safe change (usually <= 10–20). Do not list internal implementation classes.
-
-- `TypeName` (class/interface/DTO/event) — defined in: [path/to/TypeName](../../path/to/TypeName); used by: ModuleA / ModuleB
-
-## 4) Dependency rules (must be explicit)
-
-- Allowed dependencies:  
-- Forbidden dependencies:  
-- Integration style: sync calls / events / shared library  
-- Shared code policy:  
-
-## 5) Key decisions (ADRs)
-
-- Link ADRs that define boundaries, dependencies, and cross-cutting patterns.  
-- Keep this section link-based. Detailed flows belong in feature docs / ADRs, not in the overview.
-
-- [docs/ADR/ADR-XXXX-some-decision.md](../ADR/ADR-XXXX-some-decision.md) — what it decides, and what it impacts
-
-## 6) Where to go next
-
-- Decisions: [docs/ADR/](../ADR/)  
-- Behaviour specs: [docs/Features/](../Features/)  
-- How to run + verify: [docs/Development/](../Development/), [docs/Testing/](../Testing/)
+1. **Discovery**: [`GameScanner.ScanAllLaunchersAsync()`](../../OpenTweak/Services/GameScanner.cs) → finds games → saves to [`DatabaseService`](../../OpenTweak/Services/DatabaseService.cs)
+2. **Fetch Tweaks**: [`PCGWService.GetTweaksForGameAsync()`](../../OpenTweak/Services/PCGWService.cs) → queries PCGW Cargo API + parses wiki → returns [`List<TweakRecipe>`](../../OpenTweak/Models/TweakRecipe.cs)
+3. **Preview**: [`TweakEngine.PreviewTweaksAsync()`](../../OpenTweak/Services/TweakEngine.cs) → reads current config values → returns diff
+4. **Apply**: [`TweakEngine.ApplyTweaksAsync()`](../../OpenTweak/Services/TweakEngine.cs) → [`BackupService.CreateSnapshotAsync()`](../../OpenTweak/Services/BackupService.cs) → modifies configs
+5. **Restore**: [`BackupService.RestoreSnapshotAsync()`](../../OpenTweak/Services/BackupService.cs) → restores files from backup
