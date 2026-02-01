@@ -1,0 +1,29 @@
+# Build outputs
+bin/
+obj/
+out/
+publish/
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+*.cache
+
+# Rider
+.idea/
+
+# NuGet
+*.nupkg
+packages/
+
+# Local database
+*.db
+
+# Logs
+*.log
+
+# OS
+Thumbs.db
+.DS_Store

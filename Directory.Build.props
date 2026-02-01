@@ -1,0 +1,9 @@
+<Project>
+  <!-- Shared build properties for OpenTweak -->
+  <PropertyGroup>
+    <Authors>OpenTweak Contributors</Authors>
+    <Copyright>Copyright 2024 OpenTweak Contributors</Copyright>
+    <RepositoryUrl>https://github.com/your-repo/OpenTweak</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyTitle>OpenTweak</AssemblyTitle>
+    <Product>OpenTweak</Product>
+    <Description>Transparent, open-source PC game optimization tool</Description>
+    <Company>OpenTweak</Company>
+    <Version>1.0.0</Version>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Modern Windows 11 UI -->
+    <PackageReference Include="WPF-UI" Version="3.0.5" />
+
+    <!-- Embedded NoSQL Database -->
+    <PackageReference Include="LiteDB" Version="5.0.21" />
+
+    <!-- Safe INI/CFG Parser -->
+    <PackageReference Include="Salaros.ConfigParser" Version="0.3.8" />
+
+    <!-- JSON Serialization -->
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+
+    <!-- Community MVVM Toolkit -->
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\**" />
+    <Resource Include="Assets\**" />
+  </ItemGroup>
+
+</Project>
