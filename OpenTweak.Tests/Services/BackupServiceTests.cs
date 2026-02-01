@@ -563,24 +563,20 @@ public class BackupServiceTests : IDisposable
     [Fact]
     public async Task CreateSnapshotAsync_HandlesConcurrentSnapshots()
     {
-        // Arrange
-        var game = new Game
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Game",
-            InstallPath = _tempDirectory
-        };
-
+        // Arrange - Use unique game names per snapshot to avoid path conflicts
         var testFile = Path.Combine(_tempDirectory, "config.ini");
         await File.WriteAllTextAsync(testFile, "test");
 
-        // Act
-        var tasks = new[]
+        var games = Enumerable.Range(1, 3).Select(i => new Game
         {
-            _backupService.CreateSnapshotAsync(game, new List<string> { testFile }),
-            _backupService.CreateSnapshotAsync(game, new List<string> { testFile }),
-            _backupService.CreateSnapshotAsync(game, new List<string> { testFile })
-        };
+            Id = Guid.NewGuid(),
+            Name = $"ConcurrentTest_{Guid.NewGuid():N}",
+            InstallPath = _tempDirectory
+        }).ToList();
+
+        // Act - Each snapshot has a unique game/path
+        var tasks = games.Select(g =>
+            _backupService.CreateSnapshotAsync(g, new List<string> { testFile }));
 
         var snapshots = await Task.WhenAll(tasks);
 

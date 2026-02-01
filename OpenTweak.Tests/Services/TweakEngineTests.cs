@@ -20,13 +20,13 @@ namespace OpenTweak.Tests.Services;
 /// </summary>
 public class TweakEngineTests : IDisposable
 {
-    private readonly Mock<BackupService> _mockBackupService;
+    private readonly Mock<IBackupService> _mockBackupService;
     private readonly TweakEngine _tweakEngine;
     private readonly string _tempDirectory;
 
     public TweakEngineTests()
     {
-        _mockBackupService = new Mock<BackupService>();
+        _mockBackupService = new Mock<IBackupService>();
         _tweakEngine = new TweakEngine(_mockBackupService.Object);
         _tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(_tempDirectory);
