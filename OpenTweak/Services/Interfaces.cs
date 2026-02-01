@@ -76,6 +76,11 @@ public interface IBackupService
     Task<bool> RestoreSnapshotAsync(Snapshot snapshot, Game game);
 
     /// <summary>
+    /// Restores files from a snapshot with detailed error information.
+    /// </summary>
+    Task<Common.Result> RestoreSnapshotWithResultAsync(Snapshot snapshot, Game game);
+
+    /// <summary>
     /// Gets all snapshots for a game.
     /// </summary>
     Task<List<Snapshot>> GetSnapshotsForGameAsync(Game game);

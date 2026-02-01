@@ -220,11 +220,11 @@ public partial class GameDetailViewModel : ObservableObject
             IsApplying = true;
             StatusMessage = "Restoring backup...";
 
-            var success = await _backupService.RestoreSnapshotAsync(snapshot, Game);
+            var result = await _backupService.RestoreSnapshotWithResultAsync(snapshot, Game);
 
-            if (success)
+            if (result.IsSuccess)
             {
-                StatusMessage = $"Restored backup from {snapshot.Timestamp:g}";
+                StatusMessage = $"✓ Restored backup from {snapshot.Timestamp:g}";
 
                 // Refresh snapshot list
                 var index = Snapshots.IndexOf(snapshot);
@@ -235,12 +235,12 @@ public partial class GameDetailViewModel : ObservableObject
             }
             else
             {
-                StatusMessage = "Restore failed - some files could not be restored";
+                StatusMessage = $"⚠ {result.Error}";
             }
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Restore failed: {ex.Message}";
+            StatusMessage = $"⚠ Restore failed: {ex.Message}";
         }
         finally
         {

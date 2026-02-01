@@ -4,6 +4,7 @@
 // See LICENSE.md for full terms.
 
 using System.IO;
+using OpenTweak.Common;
 using OpenTweak.Models;
 
 namespace OpenTweak.Services;
@@ -112,6 +113,61 @@ public class BackupService : IBackupService
         await SaveSnapshotMetadataAsync(snapshot);
 
         return success;
+    }
+
+    /// <summary>
+    /// Restores files from a snapshot with detailed error information.
+    /// </summary>
+    public async Task<Result> RestoreSnapshotWithResultAsync(Snapshot snapshot, Game game)
+    {
+        if (!Directory.Exists(snapshot.BackupPath))
+            return Result.Failure($"Backup directory not found: {snapshot.BackupPath}");
+
+        var failedFiles = new List<string>();
+
+        foreach (var originalPath in snapshot.FilesBackedUp)
+        {
+            try
+            {
+                var relativePath = GetRelativePath(originalPath, game.InstallPath);
+                var backupFilePath = Path.Combine(snapshot.BackupPath, relativePath);
+
+                if (!File.Exists(backupFilePath))
+                {
+                    failedFiles.Add($"{Path.GetFileName(originalPath)} (backup file missing)");
+                    continue;
+                }
+
+                await CopyFileAsync(backupFilePath, originalPath);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                failedFiles.Add($"{Path.GetFileName(originalPath)} (access denied - file may be in use)");
+            }
+            catch (IOException ex)
+            {
+                failedFiles.Add($"{Path.GetFileName(originalPath)} ({ex.Message})");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to restore {originalPath}: {ex.Message}");
+                failedFiles.Add($"{Path.GetFileName(originalPath)} (unexpected error)");
+            }
+        }
+
+        // Update snapshot status
+        snapshot.WasRestored = true;
+        snapshot.RestoredDate = DateTime.UtcNow;
+        await SaveSnapshotMetadataAsync(snapshot);
+
+        if (failedFiles.Count > 0)
+        {
+            var fileList = string.Join(", ", failedFiles.Take(3));
+            var more = failedFiles.Count > 3 ? $" and {failedFiles.Count - 3} more" : "";
+            return Result.Failure($"Failed to restore: {fileList}{more}");
+        }
+
+        return Result.Success();
     }
 
     /// <summary>
