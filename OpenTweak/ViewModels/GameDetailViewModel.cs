@@ -17,10 +17,10 @@ namespace OpenTweak.ViewModels;
 /// </summary>
 public partial class GameDetailViewModel : ObservableObject
 {
-    private readonly DatabaseService _databaseService;
-    private readonly TweakEngine _tweakEngine;
-    private readonly BackupService _backupService;
-    private readonly PCGWService _pcgwService;
+    private readonly IDatabaseService _databaseService;
+    private readonly ITweakEngine _tweakEngine;
+    private readonly IBackupService _backupService;
+    private readonly IPCGWService _pcgwService;
 
     [ObservableProperty]
     private Game? _game;
@@ -46,12 +46,15 @@ public partial class GameDetailViewModel : ObservableObject
     [ObservableProperty]
     private bool _showDiffPreview;
 
-    public GameDetailViewModel()
+    /// <summary>
+    /// Creates a GameDetailViewModel with injected services.
+    /// </summary>
+    public GameDetailViewModel(IDatabaseService databaseService, IBackupService backupService, ITweakEngine tweakEngine, IPCGWService pcgwService)
     {
-        _databaseService = DatabaseService.Instance;
-        _backupService = new BackupService();
-        _tweakEngine = new TweakEngine(_backupService);
-        _pcgwService = new PCGWService();
+        _databaseService = databaseService;
+        _backupService = backupService;
+        _tweakEngine = tweakEngine;
+        _pcgwService = pcgwService;
     }
 
     /// <summary>

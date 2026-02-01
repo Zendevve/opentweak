@@ -27,9 +27,9 @@ public enum ViewMode
 /// </summary>
 public partial class MainViewModel : ObservableObject
 {
-    private readonly GameScanner _gameScanner;
-    private readonly DatabaseService _databaseService;
-    private readonly PCGWService _pcgwService;
+    private readonly IGameScanner _gameScanner;
+    private readonly IDatabaseService _databaseService;
+    private readonly IPCGWService _pcgwService;
 
     [ObservableProperty]
     private ObservableCollection<Game> _games = new();
@@ -55,11 +55,14 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool _isSlideOverOpen;
 
-    public MainViewModel()
+    /// <summary>
+    /// Creates a MainViewModel with injected services.
+    /// </summary>
+    public MainViewModel(IGameScanner gameScanner, IDatabaseService databaseService, IPCGWService pcgwService)
     {
-        _gameScanner = new GameScanner();
-        _databaseService = DatabaseService.Instance;
-        _pcgwService = new PCGWService();
+        _gameScanner = gameScanner;
+        _databaseService = databaseService;
+        _pcgwService = pcgwService;
 
         // Load cached games on startup
         LoadCachedGames();

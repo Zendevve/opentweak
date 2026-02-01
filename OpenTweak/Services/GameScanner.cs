@@ -14,7 +14,7 @@ namespace OpenTweak.Services;
 /// Scans for installed games across multiple launchers (Steam, Epic, GOG, Xbox, Manual).
 /// Returns a unified list of Game objects regardless of source.
 /// </summary>
-public class GameScanner
+public class GameScanner : IGameScanner
 {
     private readonly List<Game> _detectedGames = new();
 

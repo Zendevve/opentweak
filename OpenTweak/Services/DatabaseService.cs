@@ -14,7 +14,7 @@ namespace OpenTweak.Services;
 /// Single-file NoSQL database - no external dependencies.
 /// Uses singleton pattern to prevent multiple instances fighting over file lock.
 /// </summary>
-public class DatabaseService : IDisposable
+public class DatabaseService : IDatabaseService, IDisposable
 {
     private static readonly Lazy<DatabaseService> _instance = new(() => new DatabaseService());
 

@@ -12,7 +12,7 @@ namespace OpenTweak.Services;
 /// Service for creating and restoring file backups.
 /// This is the "Holy Grail" feature - automatic backup before any change.
 /// </summary>
-public class BackupService
+public class BackupService : IBackupService
 {
     private readonly string _backupBasePath;
 

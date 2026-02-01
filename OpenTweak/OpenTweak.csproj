@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <!-- Modern Windows 11 UI -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
     <PackageReference Include="WPF-UI" Version="3.0.5" />
 
     <!-- Embedded NoSQL Database -->

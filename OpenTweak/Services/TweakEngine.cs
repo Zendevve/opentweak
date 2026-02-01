@@ -13,11 +13,11 @@ namespace OpenTweak.Services;
 /// Engine for applying and previewing tweaks safely.
 /// Uses Salaros.ConfigParser to preserve comments in config files.
 /// </summary>
-public class TweakEngine
+public class TweakEngine : ITweakEngine
 {
-    private readonly BackupService _backupService;
+    private readonly IBackupService _backupService;
 
-    public TweakEngine(BackupService backupService)
+    public TweakEngine(IBackupService backupService)
     {
         _backupService = backupService;
     }

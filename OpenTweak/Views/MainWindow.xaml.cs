@@ -9,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Controls;
 using OpenTweak.ViewModels;
 using OpenTweak.Models;
@@ -28,6 +29,10 @@ public partial class MainWindow : FluentWindow
     public MainWindow()
     {
         InitializeComponent();
+
+        // Resolve ViewModel from DI container
+        DataContext = App.Services.GetRequiredService<MainViewModel>();
+
         InitializeAnimations();
         DataContextChanged += OnDataContextChanged;
     }

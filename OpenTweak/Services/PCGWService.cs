@@ -19,7 +19,7 @@ namespace OpenTweak.Services;
 /// Service for interacting with PCGamingWiki API and data.
 /// This is the "Twiki-Killer" - extracting actual fix instructions from wiki pages.
 /// </summary>
-public class PCGWService
+public class PCGWService : IPCGWService
 {
     // Static HttpClient is the recommended pattern per Microsoft guidelines
     // https://learn.microsoft.com/en-us/dotnet/fundamentals/networking/http/httpclient-guidelines
