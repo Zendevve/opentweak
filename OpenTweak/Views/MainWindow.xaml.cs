@@ -267,16 +267,20 @@ public class ViewModeToVisibilityConverter : IValueConverter
 
 /// <summary>
 /// Converter that returns a brush based on selection state.
+/// Returns a subtle highlight when selected, transparent otherwise.
 /// </summary>
 public class SelectionToBrushConverter : IValueConverter
 {
+    private static readonly Brush SelectedBrush = new SolidColorBrush(Color.FromArgb(32, 128, 128, 128));
+    private static readonly Brush UnselectedBrush = new SolidColorBrush(Colors.Transparent);
+
     public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
     {
         if (value is bool isSelected && isSelected)
         {
-            return new SolidColorBrush(Colors.Transparent);
+            return SelectedBrush;
         }
-        return new SolidColorBrush(Colors.Transparent);
+        return UnselectedBrush;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

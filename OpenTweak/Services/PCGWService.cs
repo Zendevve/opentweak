@@ -193,7 +193,10 @@ public class PCGWService
                 }
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to extract config file paths from wiki text: {ex.Message}");
+        }
 
         return paths;
     }
@@ -233,7 +236,10 @@ public class PCGWService
                 }
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to extract save game paths from wiki text: {ex.Message}");
+        }
 
         return paths;
     }

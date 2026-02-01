@@ -187,85 +187,41 @@ public class TweakEngine
 
     /// <summary>
     /// Applies a tweak to JSON config files.
+    /// TODO: Implement proper JSON modification using System.Text.Json or Newtonsoft.Json.
     /// </summary>
-    private async Task ApplyJsonTweakAsync(string filePath, TweakRecipe recipe)
+    private Task ApplyJsonTweakAsync(string filePath, TweakRecipe recipe)
     {
-        if (!File.Exists(filePath))
-            return;
-
-        var json = await File.ReadAllTextAsync(filePath);
-
-        // Simple JSON modification (for complex nested paths, would need JsonPath)
-        // This is a basic implementation
-        using var doc = System.Text.Json.JsonDocument.Parse(json);
-        var options = new System.Text.Json.JsonWriterOptions { Indented = true };
-
-        using var stream = new MemoryStream();
-        using (var writer = new System.Text.Json.Utf8JsonWriter(stream, options))
-        {
-            // Clone and modify - simplified implementation
-            doc.WriteTo(writer);
-        }
-
-        // For now, use simple string replacement (basic implementation)
-        // A full implementation would use a proper JSON manipulation library
-        var pattern = $@"""{recipe.Key}""\s*:\s*[^,\r\n\}}]+";
-        var replacement = $@"""{recipe.Key}"": {recipe.Value}";
-
-        var modified = System.Text.RegularExpressions.Regex.Replace(json, pattern, replacement);
-        await File.WriteAllTextAsync(filePath, modified);
+        // SAFETY: The previous regex-based implementation could corrupt JSON files.
+        // This is stubbed out until a proper implementation using a JSON library is added.
+        throw new NotSupportedException(
+            $"JSON config modification is not yet implemented safely. " +
+            $"Please manually edit '{filePath}' and set '{recipe.Key}' to '{recipe.Value}'.");
     }
 
     /// <summary>
     /// Applies a tweak to XML config files.
+    /// TODO: Implement proper XML modification with XPath support.
     /// </summary>
-    private async Task ApplyXmlTweakAsync(string filePath, TweakRecipe recipe)
+    private Task ApplyXmlTweakAsync(string filePath, TweakRecipe recipe)
     {
-        if (!File.Exists(filePath))
-            return;
-
-        var doc = new System.Xml.XmlDocument();
-        doc.Load(filePath);
-
-        // Find the node by key (simplified - assumes key is element name)
-        var nodes = doc.GetElementsByTagName(recipe.Key);
-        if (nodes.Count > 0)
-        {
-            nodes[0]!.InnerText = recipe.Value;
-        }
-
-        doc.Save(filePath);
+        // SAFETY: The previous implementation only handled simple element names.
+        // This is stubbed out until a proper implementation with XPath is added.
+        throw new NotSupportedException(
+            $"XML config modification is not yet implemented safely. " +
+            $"Please manually edit '{filePath}' and set '{recipe.Key}' to '{recipe.Value}'.");
     }
 
     /// <summary>
     /// Applies a tweak to the Windows Registry.
+    /// TODO: Implement proper registry modification with backup and type detection.
     /// </summary>
     private void ApplyRegistryTweak(TweakRecipe recipe)
     {
-        // Registry path format: HKEY_CURRENT_USER\Software\Game\Key
-        // The FilePath contains the registry path, Key is the value name, Value is the data
-
-        try
-        {
-            var parts = recipe.FilePath.Split('\\', 2);
-            if (parts.Length != 2) return;
-
-            var rootKey = parts[0].ToUpper() switch
-            {
-                "HKEY_CURRENT_USER" or "HKCU" => Microsoft.Win32.Registry.CurrentUser,
-                "HKEY_LOCAL_MACHINE" or "HKLM" => Microsoft.Win32.Registry.LocalMachine,
-                _ => null
-            };
-
-            if (rootKey == null) return;
-
-            using var key = rootKey.OpenSubKey(parts[1], true);
-            key?.SetValue(recipe.Key, recipe.Value);
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Registry tweak failed: {ex.Message}");
-        }
+        // SAFETY: Registry modifications require careful handling of value types
+        // and proper backup. This is stubbed out until a safer implementation is added.
+        throw new NotSupportedException(
+            $"Registry modification is not yet implemented safely. " +
+            $"Please manually edit registry path '{recipe.FilePath}' and set '{recipe.Key}' to '{recipe.Value}'.");
     }
 
     /// <summary>
@@ -295,7 +251,10 @@ public class TweakEngine
                     break;
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to read config value {key} from {filePath}: {ex.Message}");
+        }
 
         return null;
     }

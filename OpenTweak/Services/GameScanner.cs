@@ -103,7 +103,10 @@ public class GameScanner
                 }
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to read Steam library folders from registry: {ex.Message}");
+        }
 
         return paths;
     }
@@ -135,8 +138,9 @@ public class GameScanner
                 PCGWTitle = nameMatch.Groups[1].Value // May need normalization
             };
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"Failed to parse Steam manifest {manifestPath}: {ex.Message}");
             return null;
         }
     }
@@ -207,8 +211,9 @@ public class GameScanner
                 PCGWTitle = displayName
             };
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"Failed to parse Epic manifest {itemPath}: {ex.Message}");
             return null;
         }
     }

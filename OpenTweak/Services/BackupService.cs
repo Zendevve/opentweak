@@ -133,7 +133,10 @@ public class BackupService
                     if (snapshot != null)
                         snapshots.Add(snapshot);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Failed to read snapshot metadata from {metadataPath}: {ex.Message}");
+                }
             }
         }
 
