@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:vm="clr-namespace:OpenTweak.ViewModels"
+        xmlns:models="clr-namespace:OpenTweak.Models"
+        xmlns:views="clr-namespace:OpenTweak.Views"
         mc:Ignorable="d"
         Title="OpenTweak"
         Height="720"
@@ -45,39 +47,57 @@
             </ui:TitleBar.Header>
         </ui:TitleBar>
 
-        <!-- Main Content - Split View -->
+        <!-- Main Content -->
         <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="350" MinWidth="280" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <!-- Game List Panel -->
-            <Border Grid.Column="0"
-                    Background="{ui:ThemeResource CardBackgroundFillColorDefaultBrush}"
+            <!-- Games Panel -->
+            <Border Background="{ui:ThemeResource CardBackgroundFillColorDefaultBrush}"
                     CornerRadius="8"
-                    Margin="16,8,8,8">
+                    Margin="16,8,16,8">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0"
-                               Text="Your Games"
-                               FontSize="20"
-                               FontWeight="SemiBold"
-                               Margin="16,16,16,8"/>
+                    <!-- Header with View Toggle -->
+                    <Grid Grid.Row="0" Margin="16,16,16,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-                    <!-- Games List -->
+                        <TextBlock Grid.Column="0"
+                                   Text="Your Games"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"/>
+
+                        <!-- View Toggle Buttons -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <ui:Button Command="{Binding SetListViewCommand}"
+                                       Appearance="{Binding CurrentViewMode, Converter={StaticResource ViewModeToAppearanceConverter}, ConverterParameter=List}"
+                                       Margin="0,0,4,0"
+                                       Padding="8,6">
+                                <ui:SymbolIcon Symbol="List24" FontSize="16"/>
+                            </ui:Button>
+                            <ui:Button Command="{Binding SetGridViewCommand}"
+                                       Appearance="{Binding CurrentViewMode, Converter={StaticResource ViewModeToAppearanceConverter}, ConverterParameter=Grid}"
+                                       Padding="8,6">
+                                <ui:SymbolIcon Symbol="Grid24" FontSize="16"/>
+                            </ui:Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- List View -->
                     <ListBox Grid.Row="1"
                              ItemsSource="{Binding Games}"
                              SelectedItem="{Binding SelectedGame}"
                              Background="Transparent"
                              BorderThickness="0"
-                             Margin="8,0,8,8">
+                             Margin="8,0,8,8"
+                             Visibility="{Binding CurrentViewMode, Converter={StaticResource ViewModeToVisibilityConverter}, ConverterParameter=List}">
                         <ListBox.ItemTemplate>
-                            <DataTemplate>
+                            <DataTemplate DataType="{x:Type models:Game}">
                                 <Grid Margin="8" Height="64">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="48" />
@@ -90,7 +110,13 @@
                                             Width="48" Height="48"
                                             CornerRadius="8"
                                             Background="{ui:ThemeResource ControlFillColorDefaultBrush}">
-                                        <ui:SymbolIcon Symbol="Games24" FontSize="24"/>
+                                        <Grid>
+                                            <Image Source="{Binding CoverImagePath}"
+                                                   Stretch="UniformToFill"
+                                                   Visibility="{Binding CoverImagePath, Converter={StaticResource NotNullToVisibilityConverter}}"/>
+                                            <ui:SymbolIcon Symbol="Games24" FontSize="24"
+                                                           Visibility="{Binding CoverImagePath, Converter={StaticResource NullToVisibilityConverter}}"/>
+                                        </Grid>
                                     </Border>
 
                                     <!-- Game Info -->
@@ -116,7 +142,124 @@
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Padding" Value="0"/>
+                                <EventSetter Event="MouseDoubleClick" Handler="OnGameDoubleClick"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
                     </ListBox>
+
+                    <!-- Grid View -->
+                    <ScrollViewer Grid.Row="1"
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  Margin="8,0,8,8"
+                                  Visibility="{Binding CurrentViewMode, Converter={StaticResource ViewModeToVisibilityConverter}, ConverterParameter=Grid}">
+                        <ItemsControl ItemsSource="{Binding Games}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal"
+                                               ItemWidth="200"
+                                               ItemHeight="280"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type models:Game}">
+                                    <Border Margin="8"
+                                            Background="{ui:ThemeResource ControlFillColorDefaultBrush}"
+                                            CornerRadius="12"
+                                            BorderThickness="2"
+                                            BorderBrush="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}, Converter={StaticResource SelectionToBrushConverter}}"
+                                            MouseLeftButtonUp="OnGameCardClick">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Opacity" Value="1"/>
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Opacity" Value="0.9"/>
+                                                        <Setter Property="Background" Value="{ui:ThemeResource ControlFillColorSecondaryBrush}"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <!-- Cover Image -->
+                                            <Border Grid.Row="0"
+                                                    CornerRadius="12,12,0,0"
+                                                    ClipToBounds="True"
+                                                    Background="{ui:ThemeResource ControlFillColorSecondaryBrush}">
+                                                <Grid>
+                                                    <Image Source="{Binding CoverImagePath}"
+                                                           Stretch="UniformToFill"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center">
+                                                        <Image.Style>
+                                                            <Style TargetType="Image">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding CoverImagePath}" Value="{x:Null}">
+                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Image.Style>
+                                                    </Image>
+                                                    <Grid>
+                                                        <Grid.Style>
+                                                            <Style TargetType="Grid">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding CoverImagePath}" Value="{x:Null}">
+                                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Grid.Style>
+                                                        <ui:SymbolIcon Symbol="Games48" FontSize="48" Opacity="0.5"/>
+                                                    </Grid>
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- Game Info -->
+                                            <StackPanel Grid.Row="1" Margin="12,8,12,12">
+                                                <TextBlock Text="{Binding Name}"
+                                                           FontWeight="SemiBold"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                                <ui:Badge Content="{Binding LauncherType}"
+                                                          Appearance="Primary"
+                                                          Margin="0,4,0,0"
+                                                          HorizontalAlignment="Left"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <!-- Empty State -->
+                    <StackPanel Grid.Row="1"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                Visibility="{Binding Games.Count, Converter={StaticResource ZeroToVisibilityConverter}}">
+                        <ui:SymbolIcon Symbol="Games48" FontSize="64" Opacity="0.3"/>
+                        <TextBlock Text="No games found"
+                                   FontSize="16"
+                                   Opacity="0.5"
+                                   Margin="0,16,0,0"
+                                   HorizontalAlignment="Center"/>
+                        <ui:Button Content="Scan for Games"
+                                   Command="{Binding ScanForGamesCommand}"
+                                   Appearance="Primary"
+                                   Margin="0,16,0,0"/>
+                    </StackPanel>
 
                     <!-- Loading Overlay -->
                     <Border Grid.Row="1"
@@ -130,88 +273,53 @@
                 </Grid>
             </Border>
 
-            <!-- Game Detail Panel -->
-            <Border Grid.Column="1"
+            <!-- Slide-Over Panel -->
+            <Border x:Name="SlideOverPanel"
                     Background="{ui:ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8"
-                    Margin="8,8,16,8">
+                    BorderBrush="{ui:ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1,0,0,0"
+                    Width="500"
+                    HorizontalAlignment="Right"
+                    Margin="0,8,0,8"
+                    CornerRadius="8,0,0,8"
+                    Panel.ZIndex="100">
+                <Border.RenderTransform>
+                    <TranslateTransform X="520"/>
+                </Border.RenderTransform>
                 <Grid>
-                    <!-- No Selection State -->
-                    <StackPanel VerticalAlignment="Center"
-                                HorizontalAlignment="Center"
-                                Visibility="{Binding SelectedGame, Converter={StaticResource NullToVisibilityConverter}}">
-                        <ui:SymbolIcon Symbol="Games48" FontSize="64" Opacity="0.3"/>
-                        <TextBlock Text="Select a game to view tweaks"
-                                   FontSize="16"
-                                   Opacity="0.5"
-                                   Margin="0,16,0,0"
-                                   HorizontalAlignment="Center"/>
-                    </StackPanel>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Close Button -->
+                    <Button Grid.Row="0"
+                            Command="{Binding CloseSlideOverCommand}"
+                            HorizontalAlignment="Right"
+                            Margin="8"
+                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <ui:SymbolIcon Symbol="Dismiss24" FontSize="16"/>
+                    </Button>
 
                     <!-- Game Detail Content -->
-                    <ContentControl Content="{Binding SelectedGame}"
+                    <ContentControl Grid.Row="1"
+                                    Content="{Binding SelectedGame}"
                                     Visibility="{Binding SelectedGame, Converter={StaticResource NotNullToVisibilityConverter}}">
                         <ContentControl.ContentTemplate>
-                            <DataTemplate>
-                                <Grid Margin="24">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="*" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-
-                                    <!-- Header -->
-                                    <StackPanel Grid.Row="0">
-                                        <TextBlock Text="{Binding Name}"
-                                                   FontSize="28"
-                                                   FontWeight="Bold"/>
-                                        <TextBlock Opacity="0.6" Margin="0,4,0,0">
-                                            <Run Text="Installed at: "/>
-                                            <Run Text="{Binding InstallPath}"/>
-                                        </TextBlock>
-                                        <Separator Margin="0,16,0,16"/>
-                                    </StackPanel>
-
-                                    <!-- Tweaks List Placeholder -->
-                                    <Border Grid.Row="1"
-                                            Background="{ui:ThemeResource ControlFillColorDefaultBrush}"
-                                            CornerRadius="8"
-                                            Padding="16">
-                                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                            <TextBlock Text="Available Tweaks"
-                                                       FontSize="18"
-                                                       FontWeight="SemiBold"
-                                                       HorizontalAlignment="Center"/>
-                                            <TextBlock Text="Click 'Fetch Tweaks' to load from PCGW"
-                                                       Opacity="0.6"
-                                                       HorizontalAlignment="Center"
-                                                       Margin="0,8,0,0"/>
-                                        </StackPanel>
-                                    </Border>
-
-                                    <!-- Action Buttons -->
-                                    <StackPanel Grid.Row="2"
-                                                Orientation="Horizontal"
-                                                HorizontalAlignment="Right"
-                                                Margin="0,16,0,0">
-                                        <ui:Button Content="Fetch Tweaks"
-                                                   Icon="{ui:SymbolIcon ArrowDownload24}"
-                                                   Margin="0,0,8,0"/>
-                                        <ui:Button Content="Preview Changes"
-                                                   Icon="{ui:SymbolIcon Eye24}"
-                                                   Margin="0,0,8,0"/>
-                                        <ui:Button Content="Optimize"
-                                                   Icon="{ui:SymbolIcon Rocket24}"
-                                                   Appearance="Primary"
-                                                   FontSize="16"
-                                                   Padding="24,12"/>
-                                    </StackPanel>
-                                </Grid>
+                            <DataTemplate DataType="{x:Type models:Game}">
+                                <views:GameDetailView DataContext="{Binding}"/>
                             </DataTemplate>
                         </ContentControl.ContentTemplate>
                     </ContentControl>
                 </Grid>
             </Border>
+
+            <!-- Slide-Over Backdrop -->
+            <Border x:Name="SlideOverBackdrop"
+                    Background="#80000000"
+                    Visibility="Collapsed"
+                    Panel.ZIndex="99"
+                    MouseLeftButtonUp="OnBackdropClick"/>
         </Grid>
 
         <!-- Status Bar -->

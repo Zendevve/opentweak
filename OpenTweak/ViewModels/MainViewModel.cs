@@ -8,6 +8,15 @@ using OpenTweak.Services;
 namespace OpenTweak.ViewModels;
 
 /// <summary>
+/// Represents the view mode for displaying games.
+/// </summary>
+public enum ViewMode
+{
+    List,
+    Grid
+}
+
+/// <summary>
 /// Main ViewModel for the application.
 /// Handles game list, scanning, and navigation.
 /// </summary>
@@ -34,6 +43,12 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private string _searchQuery = string.Empty;
+
+    [ObservableProperty]
+    private ViewMode _currentViewMode = ViewMode.List;
+
+    [ObservableProperty]
+    private bool _isSlideOverOpen;
 
     public MainViewModel()
     {
@@ -129,7 +144,10 @@ public partial class MainViewModel : ObservableObject
         Games.Remove(game);
 
         if (SelectedGame == game)
+        {
             SelectedGame = null;
+            IsSlideOverOpen = false;
+        }
 
         StatusMessage = $"Removed {game.Name}";
     }
@@ -164,6 +182,52 @@ public partial class MainViewModel : ObservableObject
         {
             IsLoading = false;
         }
+    }
+
+    /// <summary>
+    /// Toggles between List and Grid view modes.
+    /// </summary>
+    [RelayCommand]
+    private void ToggleViewMode()
+    {
+        CurrentViewMode = CurrentViewMode == ViewMode.List ? ViewMode.Grid : ViewMode.List;
+    }
+
+    /// <summary>
+    /// Sets the view mode to List.
+    /// </summary>
+    [RelayCommand]
+    private void SetListView()
+    {
+        CurrentViewMode = ViewMode.List;
+    }
+
+    /// <summary>
+    /// Sets the view mode to Grid.
+    /// </summary>
+    [RelayCommand]
+    private void SetGridView()
+    {
+        CurrentViewMode = ViewMode.Grid;
+    }
+
+    /// <summary>
+    /// Opens the slide-over panel for the selected game.
+    /// </summary>
+    [RelayCommand]
+    public void OpenGameDetails(Game game)
+    {
+        SelectedGame = game;
+        IsSlideOverOpen = true;
+    }
+
+    /// <summary>
+    /// Closes the slide-over panel.
+    /// </summary>
+    [RelayCommand]
+    public void CloseSlideOver()
+    {
+        IsSlideOverOpen = false;
     }
 
     /// <summary>
