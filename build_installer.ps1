@@ -1,3 +1,7 @@
+param (
+    [switch]$Official
+)
+
 $ErrorActionPreference = "Stop"
 
 Write-Host "Building OpenTweak..." -ForegroundColor Cyan
@@ -12,7 +16,21 @@ if (Test-Path $publishDir) {
 }
 
 # Publish single file
-dotnet publish $projectPath -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o $publishDir
+$buildArgs = @(
+    "publish", $projectPath,
+    "-c", "Release",
+    "-r", "win-x64",
+    "--self-contained", "false",
+    "-p:PublishSingleFile=true",
+    "-o", $publishDir
+)
+
+if ($Official) {
+    Write-Host "BUILDING OFFICIAL RELEASE" -ForegroundColor Yellow
+    $buildArgs += "-p:OfficialBuild=true"
+}
+
+dotnet @buildArgs
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Build failed!"
