@@ -163,6 +163,11 @@ public partial class MainWindow : FluentWindow
             vm.CloseSlideOver();
         }
     }
+    private void OnHyperlinkNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+    {
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+        e.Handled = true;
+    }
 }
 
 /// <summary>

@@ -2,8 +2,8 @@
   <!-- Shared build properties for OpenTweak -->
   <PropertyGroup>
     <Authors>OpenTweak Contributors</Authors>
-    <Copyright>Copyright 2024 OpenTweak Contributors</Copyright>
-    <RepositoryUrl>https://github.com/your-repo/OpenTweak</RepositoryUrl>
+    <Copyright>Copyright 2024-2025 OpenTweak Contributors</Copyright>
+    <RepositoryUrl>https://github.com/nathanielopentweak/opentweak</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 </Project>

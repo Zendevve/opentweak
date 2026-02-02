@@ -55,6 +55,11 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool _isSlideOverOpen;
 
+    public bool IsOfficialBuild => BuildIdentity.IsOfficialBuild;
+    public bool IsCommunityBuild => !IsOfficialBuild;
+    public string BuildTypeString => BuildIdentity.BuildTypeString;
+    public string AppVersion => BuildIdentity.Version;
+
     /// <summary>
     /// Creates a MainViewModel with injected services.
     /// </summary>

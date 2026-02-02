@@ -27,3 +27,7 @@ packages/
 # OS
 Thumbs.db
 .DS_Store
+
+# Installer
+setup.iss
+Output/

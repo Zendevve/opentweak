@@ -327,13 +327,37 @@
                 Background="{ui:ThemeResource CardBackgroundFillColorSecondaryBrush}"
                 Padding="16,8">
             <Grid>
-                <TextBlock Text="{Binding StatusMessage}"
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="{Binding StatusMessage}"
                            VerticalAlignment="Center"
                            Opacity="0.8"/>
-                <TextBlock Text="OpenTweak v1.0.0"
-                           HorizontalAlignment="Right"
-                           VerticalAlignment="Center"
-                           Opacity="0.5"/>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <!-- Community Build Warning -->
+                    <Border Background="#1AFFA500" CornerRadius="4" Padding="8,2" Margin="0,0,12,0"
+                            Visibility="{Binding IsCommunityBuild, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <TextBlock VerticalAlignment="Center" FontSize="12">
+                            <Run Text="⚠️ Community Build -" Foreground="Orange" FontWeight="SemiBold"/>
+                            <Hyperlink NavigateUri="https://buymeacoffee.com/opentweak" RequestNavigate="OnHyperlinkNavigate" TextDecorations="None">
+                                <Run Text="Support Development (Get Official Build)" Foreground="Orange"/>
+                            </Hyperlink>
+                        </TextBlock>
+                    </Border>
+
+                    <TextBlock Text="{Binding BuildTypeString}"
+                               VerticalAlignment="Center"
+                               Opacity="0.5"
+                               Margin="0,0,8,0"/>
+
+                    <TextBlock Text="{Binding AppVersion, StringFormat='v{0}'}"
+                               VerticalAlignment="Center"
+                               Opacity="0.5"/>
+                </StackPanel>
             </Grid>
         </Border>
     </Grid>
