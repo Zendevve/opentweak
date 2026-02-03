@@ -17,9 +17,7 @@
         ExtendsContentIntoTitleBar="True"
         WindowBackdropType="Mica">
 
-    <ui:FluentWindow.DataContext>
-        <vm:MainViewModel />
-    </ui:FluentWindow.DataContext>
+    <!-- DataContext is set in code-behind via DI -->
 
     <Grid>
         <Grid.RowDefinitions>

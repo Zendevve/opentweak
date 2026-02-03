@@ -29,15 +29,40 @@ public partial class App : Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        // Set up global exception handling to help diagnose crashes
+        AppDomain.CurrentDomain.UnhandledException += (s, args) =>
+        {
+            var ex = args.ExceptionObject as Exception;
+            System.Windows.MessageBox.Show(
+                $"A fatal error occurred:\n\n{ex?.Message}\n\n{ex?.StackTrace}",
+                "OpenTweak Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        };
+
+        DispatcherUnhandledException += (s, args) =>
+        {
+            System.Windows.MessageBox.Show(
+                $"An error occurred:\n\n{args.Exception.Message}\n\n{args.Exception.StackTrace}",
+                "OpenTweak Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            args.Handled = true;
+        };
+
         base.OnStartup(e);
 
-        // Configure dependency injection
+        // Configure dependency injection BEFORE creating any windows
         var services = new ServiceCollection();
         ConfigureServices(services);
         Services = services.BuildServiceProvider();
 
         // Apply system theme (follows Windows dark/light mode)
         ApplicationThemeManager.ApplySystemTheme();
+
+        // Now create and show the main window (after services are ready)
+        var mainWindow = new Views.MainWindow();
+        mainWindow.Show();
     }
 
     private static void ConfigureServices(IServiceCollection services)
