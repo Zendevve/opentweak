@@ -5,6 +5,7 @@
 
 using System.IO;
 using System.Security.Cryptography;
+using Microsoft.Extensions.Logging;
 using OpenTweak.Common;
 using OpenTweak.Models;
 
@@ -17,9 +18,12 @@ namespace OpenTweak.Services;
 public class BackupService : IBackupService
 {
     private readonly string _backupBasePath;
+    private readonly Microsoft.Extensions.Logging.ILogger<BackupService> _logger;
 
-    public BackupService(string? backupBasePath = null)
+    public BackupService(Microsoft.Extensions.Logging.ILogger<BackupService> logger, string? backupBasePath = null)
     {
+        _logger = logger;
+
         if (string.IsNullOrEmpty(backupBasePath))
         {
             // Store backups in AppData to avoid cluttering game directories
@@ -77,7 +81,7 @@ public class BackupService : IBackupService
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Failed to backup {filePath}: {ex.Message}");
+                _logger.LogError(ex, "Failed to backup {FilePath}", filePath);
             }
         }
 
@@ -113,7 +117,7 @@ public class BackupService : IBackupService
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Failed to restore {originalPath}: {ex.Message}");
+                _logger.LogError(ex, "Failed to restore {OriginalPath}", originalPath);
                 success = false;
             }
         }
@@ -163,7 +167,7 @@ public class BackupService : IBackupService
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Failed to restore {originalPath}: {ex.Message}");
+                _logger.LogError(ex, "Failed to restore {OriginalPath}", originalPath);
                 failedFiles.Add($"{Path.GetFileName(originalPath)} (unexpected error)");
             }
         }
@@ -211,7 +215,7 @@ public class BackupService : IBackupService
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Failed to read snapshot metadata from {metadataPath}: {ex.Message}");
+                    _logger.LogWarning(ex, "Failed to read snapshot metadata from {MetadataPath}", metadataPath);
                 }
             }
         }
@@ -234,7 +238,7 @@ public class BackupService : IBackupService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Failed to delete snapshot: {ex.Message}");
+            _logger.LogError(ex, "Failed to delete snapshot");
         }
 
         return false;

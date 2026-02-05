@@ -10,6 +10,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using OpenTweak.Models;
 using OpenTweak.Services;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 
 namespace OpenTweak.Tests.Services;
@@ -28,7 +30,8 @@ public class BackupServiceTests : IDisposable
         _tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         _backupBasePath = Path.Combine(_tempDirectory, "Backups");
         Directory.CreateDirectory(_tempDirectory);
-        _backupService = new BackupService(_backupBasePath);
+        var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<BackupService>>();
+        _backupService = new BackupService(mockLogger.Object, _backupBasePath);
         Directory.CreateDirectory(_tempDirectory);
     }
 

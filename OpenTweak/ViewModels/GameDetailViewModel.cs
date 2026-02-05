@@ -21,6 +21,7 @@ public partial class GameDetailViewModel : ObservableObject
     private readonly ITweakEngine _tweakEngine;
     private readonly IBackupService _backupService;
     private readonly IPCGWService _pcgwService;
+    private readonly INotificationService _notificationService;
 
     [ObservableProperty]
     private Game? _game;
@@ -49,12 +50,18 @@ public partial class GameDetailViewModel : ObservableObject
     /// <summary>
     /// Creates a GameDetailViewModel with injected services.
     /// </summary>
-    public GameDetailViewModel(IDatabaseService databaseService, IBackupService backupService, ITweakEngine tweakEngine, IPCGWService pcgwService)
+    public GameDetailViewModel(
+        IDatabaseService databaseService,
+        IBackupService backupService,
+        ITweakEngine tweakEngine,
+        IPCGWService pcgwService,
+        INotificationService notificationService)
     {
         _databaseService = databaseService;
         _backupService = backupService;
         _tweakEngine = tweakEngine;
         _pcgwService = pcgwService;
+        _notificationService = notificationService;
     }
 
     /// <summary>
@@ -96,6 +103,7 @@ public partial class GameDetailViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = $"Load failed: {ex.Message}";
+            _notificationService.ShowError($"Failed to load game data: {ex.Message}");
         }
         finally
         {
@@ -199,12 +207,14 @@ public partial class GameDetailViewModel : ObservableObject
             if (result.AllSucceeded)
             {
                 StatusMessage = $"✓ Successfully applied {result.SuccessfulTweaks.Count} tweaks!";
+                _notificationService.ShowSuccess($"Applied {result.SuccessfulTweaks.Count} tweaks successfully.");
             }
             else if (result.HasFailures)
             {
                 var failureCount = result.FailedTweaks.Count;
                 var successCount = result.SuccessfulTweaks.Count;
                 StatusMessage = $"⚠ Completed with issues: {successCount} applied, {failureCount} failed.";
+                _notificationService.ShowWarning($"Completed with issues: {failureCount} tweaks failed to apply.");
 
                 // Detailed reporting (in a real app, this might show a dialog)
                 foreach(var fail in result.FailedTweaks)
@@ -216,11 +226,13 @@ public partial class GameDetailViewModel : ObservableObject
             {
                 // Should not happen if tweaks were selected
                 StatusMessage = "No tweaks were applied.";
+                _notificationService.ShowWarning("No tweaks were applied.");
             }
         }
         catch (Exception ex)
         {
             StatusMessage = $"Apply failed: {ex.Message}";
+            _notificationService.ShowError($"Failed to apply tweaks: {ex.Message}");
         }
         finally
         {
@@ -257,11 +269,13 @@ public partial class GameDetailViewModel : ObservableObject
             else
             {
                 StatusMessage = $"⚠ {result.Error}";
+                _notificationService.ShowError(result.Error ?? "Restore failed");
             }
         }
         catch (Exception ex)
         {
             StatusMessage = $"⚠ Restore failed: {ex.Message}";
+            _notificationService.ShowError($"Restore failed: {ex.Message}");
         }
         finally
         {

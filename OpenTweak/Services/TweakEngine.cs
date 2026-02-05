@@ -8,6 +8,7 @@ using System.Threading;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 using Salaros.Configuration;
 using OpenTweak.Models;
 
@@ -20,10 +21,12 @@ namespace OpenTweak.Services;
 public class TweakEngine : ITweakEngine
 {
     private readonly IBackupService _backupService;
+    private readonly Microsoft.Extensions.Logging.ILogger<TweakEngine> _logger;
 
-    public TweakEngine(IBackupService backupService)
+    public TweakEngine(IBackupService backupService, Microsoft.Extensions.Logging.ILogger<TweakEngine> logger)
     {
         _backupService = backupService;
+        _logger = logger;
     }
 
     /// <summary>
@@ -88,7 +91,7 @@ public class TweakEngine : ITweakEngine
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Preview error for {recipe.Key}: {ex.Message}");
+                _logger.LogError(ex, "Preview error for {TweakKey}", recipe.Key);
             }
         }
 
@@ -165,6 +168,7 @@ public class TweakEngine : ITweakEngine
              }
              catch (Exception ex)
              {
+                 _logger.LogError(ex, "Failed to apply tweak {TweakKey}", recipe.Key);
                  AddFailure(recipe, ex.Message, ex);
              }
          }
@@ -269,7 +273,7 @@ public class TweakEngine : ITweakEngine
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Failed to parse JSON file {filePath}: {ex.Message}");
+                _logger.LogError(ex, "Failed to parse JSON file {FilePath}", filePath);
                 // If parsing fails, we might want to start fresh or error out.
                 // For safety, let's treat it as a new file if it's empty/invalid?
                 // No, that's dangerous. Better to throw.
@@ -518,7 +522,7 @@ public class TweakEngine : ITweakEngine
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Failed to read config value {key} from {filePath}: {ex.Message}");
+            _logger.LogWarning(ex, "Failed to read config value {Key} from {FilePath}", key, filePath);
         }
 
         return null;

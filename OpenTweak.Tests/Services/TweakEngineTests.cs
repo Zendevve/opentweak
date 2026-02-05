@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Moq;
+using Microsoft.Extensions.Logging;
 using OpenTweak.Models;
 using OpenTweak.Services;
 using Xunit;
@@ -27,7 +28,8 @@ public class TweakEngineTests : IDisposable
     public TweakEngineTests()
     {
         _mockBackupService = new Mock<IBackupService>();
-        _tweakEngine = new TweakEngine(_mockBackupService.Object);
+        var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<TweakEngine>>();
+        _tweakEngine = new TweakEngine(_mockBackupService.Object, mockLogger.Object);
         _tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(_tempDirectory);
     }
@@ -400,6 +402,7 @@ public class TweakEngineTests : IDisposable
                 FilePath = Path.Combine(_tempDirectory, "test1.ini"),
                 Key = "Key1",
                 Value = "Value1",
+                Section = "Settings",
                 TargetType = TweakTargetType.IniFile
             },
             new TweakRecipe
@@ -409,6 +412,7 @@ public class TweakEngineTests : IDisposable
                 FilePath = Path.Combine(_tempDirectory, "test2.ini"),
                 Key = "Key2",
                 Value = "Value2",
+                Section = "Settings",
                 TargetType = TweakTargetType.IniFile
             }
         };

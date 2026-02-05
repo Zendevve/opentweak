@@ -11,6 +11,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using OpenTweak.Models;
 
 namespace OpenTweak.Services;
@@ -30,6 +31,7 @@ public class PCGWService : IPCGWService
 
     // Instance client allows dependency injection for testing
     private readonly HttpClient _client;
+    private readonly Microsoft.Extensions.Logging.ILogger<PCGWService> _logger;
 
     private static HttpClient CreateDefaultClient()
     {
@@ -41,16 +43,17 @@ public class PCGWService : IPCGWService
     /// <summary>
     /// Creates a new PCGWService using the shared HttpClient.
     /// </summary>
-    public PCGWService() : this(s_sharedClient)
+    public PCGWService(Microsoft.Extensions.Logging.ILogger<PCGWService> logger) : this(s_sharedClient, logger)
     {
     }
 
     /// <summary>
     /// Creates a new PCGWService with a custom HttpClient (for testing).
     /// </summary>
-    public PCGWService(HttpClient httpClient)
+    public PCGWService(HttpClient httpClient, Microsoft.Extensions.Logging.ILogger<PCGWService> logger)
     {
         _client = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        _logger = logger;
     }
 
     #region Public API Methods
@@ -97,7 +100,7 @@ public class PCGWService : IPCGWService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error searching PCGW: {ex.Message}");
+            _logger.LogError(ex, "Error searching PCGW for {GameTitle}", gameTitle);
             return null;
         }
     }
@@ -144,7 +147,7 @@ public class PCGWService : IPCGWService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error getting PCGW page content: {ex.Message}");
+            _logger.LogError(ex, "Error getting PCGW page content for {PageTitle}", pageTitle);
             return null;
         }
     }
@@ -226,7 +229,7 @@ public class PCGWService : IPCGWService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Failed to extract config file paths from wiki text: {ex.Message}");
+            _logger.LogWarning(ex, "Failed to extract config file paths from wiki text");
         }
 
         return paths;
@@ -269,7 +272,7 @@ public class PCGWService : IPCGWService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Failed to extract save game paths from wiki text: {ex.Message}");
+            _logger.LogWarning(ex, "Failed to extract save game paths from wiki text");
         }
 
         return paths;

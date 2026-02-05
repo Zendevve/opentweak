@@ -15,6 +15,11 @@ using OpenTweak.ViewModels;
 using Wpf.Ui;
 using Wpf.Ui.Appearance;
 
+using Serilog;
+using Polly;
+using Polly.Extensions.Http;
+using System.Net.Http;
+
 namespace OpenTweak;
 
 /// <summary>
@@ -29,7 +34,6 @@ public partial class App : Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        System.IO.File.AppendAllText("debug_log.txt", "Startup: OnStartup called\n");
 
         // Set up global exception handling to help diagnose crashes
         AppDomain.CurrentDomain.UnhandledException += (s, args) =>
@@ -63,20 +67,16 @@ public partial class App : Application
         ApplicationThemeManager.ApplySystemTheme();
 
         // Debug logging
-        System.IO.File.AppendAllText("debug_log.txt", "Startup: Services Configured\n");
 
         try
         {
             // Now create and show the main window (after services are ready)
-            var mainWindow = new Views.MainWindow();
-            System.IO.File.AppendAllText("debug_log.txt", "Startup: MainWindow Created\n");
+            var mainWindow = new Views.MainWindow(Services.GetRequiredService<ISnackbarService>());
 
             mainWindow.Show();
-            System.IO.File.AppendAllText("debug_log.txt", "Startup: MainWindow Shown\n");
         }
         catch (Exception ex)
         {
-             System.IO.File.AppendAllText("debug_log.txt", $"Startup Error: {ex}\n");
              MessageBox.Show(ex.ToString());
              throw;
         }
@@ -84,10 +84,32 @@ public partial class App : Application
 
     private static void ConfigureServices(IServiceCollection services)
     {
+        // Logging
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+
+        services.AddLogging(lb => lb.AddSerilog());
+
+        // UI Services
+        services.AddSingleton<ISnackbarService, SnackbarService>();
+        services.AddSingleton<INotificationService, NotificationService>();
+
         // Services - singletons for shared state
         services.AddSingleton<IDatabaseService>(_ => DatabaseService.Instance);
         services.AddSingleton<IBackupService, BackupService>();
-        services.AddSingleton<IPCGWService, PCGWService>();
+
+        // Resilience Policy
+        var retryPolicy = HttpPolicyExtensions
+            .HandleTransientHttpError()
+            .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound) // Handling PCGW weirdness
+            .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+
+        // Register HTTP Client with Polly
+        services.AddHttpClient<IPCGWService, PCGWService>()
+            .AddPolicyHandler(retryPolicy);
+
         services.AddSingleton<IGameScanner, GameScanner>();
 
         // TweakEngine depends on IBackupService

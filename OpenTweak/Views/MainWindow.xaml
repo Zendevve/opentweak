@@ -352,6 +352,9 @@
                 </StackPanel>
             </Grid>
         </Border>
+
+        <!-- Notification Snackbar -->
+        <ui:SnackbarPresenter x:Name="SnackbarPresenter" Grid.RowSpan="3" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,24" Panel.ZIndex="200"/>
     </Grid>
 
     <ui:FluentWindow.Resources>

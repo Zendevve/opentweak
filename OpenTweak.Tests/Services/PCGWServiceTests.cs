@@ -11,6 +11,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
 using OpenTweak.Models;
@@ -506,7 +507,8 @@ Edit {{file|audio.ini}} and set <code>BufferSize=512</code>
     private PCGWService CreateService()
     {
         // Now that PCGWService supports HttpClient injection, we can inject our mock!
-        return new PCGWService(_httpClient);
+        var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<PCGWService>>();
+        return new PCGWService(_httpClient, mockLogger.Object);
     }
 
     private void SetupMockResponse(string urlPattern, string content)
@@ -516,7 +518,7 @@ Edit {{file|audio.ini}} and set <code>BufferSize=512</code>
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri!.ToString().Contains(urlPattern)),
+                    req.RequestUri!.AbsoluteUri.Contains(urlPattern)),
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage

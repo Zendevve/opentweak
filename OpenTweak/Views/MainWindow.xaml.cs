@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using Microsoft.Extensions.DependencyInjection;
+using Wpf.Ui;
 using Wpf.Ui.Controls;
 using OpenTweak.ViewModels;
 using OpenTweak.Models;
@@ -26,9 +27,12 @@ public partial class MainWindow : FluentWindow
     private Storyboard? _fadeInStoryboard;
     private Storyboard? _fadeOutStoryboard;
 
-    public MainWindow()
+    public MainWindow(ISnackbarService snackbarService)
     {
         InitializeComponent();
+
+        // Register the presenter
+        snackbarService.SetSnackbarPresenter(SnackbarPresenter);
 
         // Resolve ViewModel from DI container
         DataContext = App.Services.GetRequiredService<MainViewModel>();

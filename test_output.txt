@@ -1,21 +1,257 @@
-  Determining projects to restore...
-  All projects are up-to-date for restore.
-  OpenTweak -> D:\COMPROG\opentweaks\OpenTweak\bin\Debug\net8.0-windows\OpenTweak.dll
-D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(111,35): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
-D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(132,24): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
-D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(154,41): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
-D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(177,45): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
-D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(222,23): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
-D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(245,38): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
-D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(271,41): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
-D:\COMPROG\opentweaks\OpenTweak.Tests\Services\TweakEngineTests.cs(324,40): error CS0854: An expression tree may not contain a call or invocation that uses optional arguments [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
-D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(297,43): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
-D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(332,64): warning CS8604: Possible null reference argument for parameter 'snapshot' in 'Task<bool> BackupService.RestoreSnapshotAsync(Snapshot snapshot, Game game, CancellationToken cancellationToken = default(CancellationToken))'. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
-D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(382,64): warning CS8604: Possible null reference argument for parameter 'snapshot' in 'Task<bool> BackupService.RestoreSnapshotAsync(Snapshot snapshot, Game game, CancellationToken cancellationToken = default(CancellationToken))'. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
-D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(403,22): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
-D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(479,41): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
-D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(508,38): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
-D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(550,9): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
-D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(585,65): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
-D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(607,23): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
-D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(633,45): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+Build started 2/5/26 10:30:22.
+     1>Project "D:\COMPROG\opentweaks\OpenTweak.sln" on node 1 (Restore target(s)).
+     1>ValidateSolutionConfiguration:
+         Building solution configuration "Debug|Any CPU".
+       _GetAllRestoreProjectPathItems:
+         Determining projects to restore...
+       Restore:
+         X.509 certificate chain validation will use the default trust store selected by .NET for code signing.
+         X.509 certificate chain validation will use the default trust store selected by .NET for timestamping.
+         Assets file has not changed. Skipping assets file writing. Path: D:\COMPROG\opentweaks\OpenTweak\obj\project.assets.json
+         Assets file has not changed. Skipping assets file writing. Path: D:\COMPROG\opentweaks\OpenTweak.Tests\obj\project.assets.json
+         Restored D:\COMPROG\opentweaks\OpenTweak\OpenTweak.csproj (in 79 ms).
+         Restored D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj (in 82 ms).
+         
+         NuGet Config files used:
+             C:\Users\natha\AppData\Roaming\NuGet\NuGet.Config
+         
+         Feeds used:
+             https://api.nuget.org/v3/index.json
+         All projects are up-to-date for restore.
+     1>Done Building Project "D:\COMPROG\opentweaks\OpenTweak.sln" (Restore target(s)).
+   1:2>Project "D:\COMPROG\opentweaks\OpenTweak.sln" on node 1 (VSTest target(s)).
+     1>ValidateSolutionConfiguration:
+         Building solution configuration "Debug|Any CPU".
+   1:2>Project "D:\COMPROG\opentweaks\OpenTweak.sln" (1:2) is building "D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj" (3:6) on node 2 (VSTest target(s)).
+     3>BuildProject:
+         Build started, please wait...
+   3:6>Project "D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj" (3:6) is building "D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj" (3:7) on node 2 (default targets).
+   3:7>Project "D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj" (3:7) is building "D:\COMPROG\opentweaks\OpenTweak\OpenTweak.csproj" (2:9) on node 1 (default targets).
+     2>MainResourcesGeneration:
+       Skipping target "MainResourcesGeneration" because all output files are up-to-date with respect to the input files.
+       GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+       CoreGenerateAssemblyInfo:
+       Skipping target "CoreGenerateAssemblyInfo" because all output files are up-to-date with respect to the input files.
+       _GenerateSourceLinkFile:
+         Source Link file 'obj\Debug\net8.0-windows\OpenTweak.sourcelink.json' is up-to-date.
+       CoreCompile:
+       Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
+       _CreateAppHost:
+       Skipping target "_CreateAppHost" because all output files are up-to-date with respect to the input files.
+       _CopyOutOfDateSourceItemsToOutputDirectory:
+       Skipping target "_CopyOutOfDateSourceItemsToOutputDirectory" because all output files are up-to-date with respect to the input files.
+       GenerateBuildDependencyFile:
+       Skipping target "GenerateBuildDependencyFile" because all output files are up-to-date with respect to the input files.
+       GenerateBuildRuntimeConfigurationFiles:
+       Skipping target "GenerateBuildRuntimeConfigurationFiles" because all output files are up-to-date with respect to the input files.
+       CopyFilesToOutputDirectory:
+         OpenTweak -> D:\COMPROG\opentweaks\OpenTweak\bin\Debug\net8.0-windows\OpenTweak.dll
+     2>Done Building Project "D:\COMPROG\opentweaks\OpenTweak\OpenTweak.csproj" (default targets).
+     3>GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+       CoreGenerateAssemblyInfo:
+       Skipping target "CoreGenerateAssemblyInfo" because all output files are up-to-date with respect to the input files.
+       _GenerateSourceLinkFile:
+         Source Link file 'obj\Debug\net8.0-windows\OpenTweak.Tests.sourcelink.json' is up-to-date.
+       CoreCompile:
+       Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
+       _CopyOutOfDateSourceItemsToOutputDirectory:
+       Skipping target "_CopyOutOfDateSourceItemsToOutputDirectory" because all output files are up-to-date with respect to the input files.
+       GenerateBuildDependencyFile:
+       Skipping target "GenerateBuildDependencyFile" because all output files are up-to-date with respect to the input files.
+       GenerateBuildRuntimeConfigurationFiles:
+       Skipping target "GenerateBuildRuntimeConfigurationFiles" because all output files are up-to-date with respect to the input files.
+       CopyFilesToOutputDirectory:
+         OpenTweak.Tests -> D:\COMPROG\opentweaks\OpenTweak.Tests\bin\Debug\net8.0-windows\OpenTweak.Tests.dll
+     3>Done Building Project "D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj" (default targets).
+     3>BuildProject:
+         Build completed.
+         
+Test run for D:\COMPROG\opentweaks\OpenTweak.Tests\bin\Debug\net8.0-windows\OpenTweak.Tests.dll (.NETCoreApp,Version=v8.0)
+VSTest version 17.11.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.5.4.1+b9eacec401 (64-bit .NET 8.0.23)
+[xUnit.net 00:00:00.18]   Discovering: OpenTweak.Tests
+[xUnit.net 00:00:00.26]   Discovered:  OpenTweak.Tests
+[xUnit.net 00:00:00.27]   Starting:    OpenTweak.Tests
+  Passed OpenTweak.Tests.Services.GameScannerTests.ScanAllLaunchersAsync_ReturnsSortedList [133 ms]
+  Passed OpenTweak.Tests.Services.GameScannerTests.ScanAllLaunchersAsync_HandlesCorruptedManifestFiles [34 ms]
+  Passed OpenTweak.Tests.Services.GameScannerTests.ScanAllLaunchersAsync_HandlesMissingRegistryKeys [47 ms]
+  Passed OpenTweak.Tests.Services.GameScannerTests.ScanAllLaunchersAsync_GamesHaveValidIds [13 ms]
+  Passed OpenTweak.Tests.Services.GameScannerTests.ScanAllLaunchersAsync_CanBeCalledConcurrently [85 ms]
+[xUnit.net 00:00:00.97]       System.Exception : Allocated Exception inside PCGWService: Handler did not return a response message.
+[xUnit.net 00:00:00.97]       ---- System.InvalidOperationException : Handler did not return a response message.
+[xUnit.net 00:00:00.97]       Stack Trace:
+[xUnit.net 00:00:00.97]         D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs(273,0): at OpenTweak.Tests.Services.PCGWServiceTests.<>c.<GetPageContentAsync_WithValidPage_ReturnsGameInfo>b__11_1(IInvocation invocation)
+[xUnit.net 00:00:00.97]         /_/src/Moq/Behaviors/Callback.cs(64,0): at Moq.Behaviors.Callback.Execute(Invocation invocation)
+[xUnit.net 00:00:00.97]         /_/src/Moq/MethodCall.cs(224,0): at Moq.MethodCall.ExecuteCore(Invocation invocation)
+[xUnit.net 00:00:00.97]         /_/src/Moq/Setup.cs(144,0): at Moq.Setup.Execute(Invocation invocation)
+[xUnit.net 00:00:00.97]         /_/src/Moq/Interception/InterceptionAspects.cs(263,0): at Moq.FindAndExecuteMatchingSetup.Handle(Invocation invocation, Mock mock)
+[xUnit.net 00:00:00.97]         /_/src/Moq/Interception/Mock.cs(17,0): at Moq.Mock.Moq.IInterceptor.Intercept(Invocation invocation)
+[xUnit.net 00:00:00.97]         /_/src/Moq/Interception/CastleProxyFactory.cs(218,0): at Moq.CastleProxyFactory.Interceptor.Intercept(IInvocation underlying)
+[xUnit.net 00:00:00.97]            at Castle.DynamicProxy.AbstractInvocation.Proceed()
+[xUnit.net 00:00:00.97]            at Castle.Proxies.ILogger`1Proxy_2.Log[TState](LogLevel logLevel, EventId eventId, TState state, Exception exception, Func`3 formatter)
+[xUnit.net 00:00:00.97]            at Microsoft.Extensions.Logging.LoggerExtensions.Log(ILogger logger, LogLevel logLevel, EventId eventId, Exception exception, String message, Object[] args)
+[xUnit.net 00:00:00.97]            at Microsoft.Extensions.Logging.LoggerExtensions.Log(ILogger logger, LogLevel logLevel, Exception exception, String message, Object[] args)
+[xUnit.net 00:00:00.97]            at Microsoft.Extensions.Logging.LoggerExtensions.LogError(ILogger logger, Exception exception, String message, Object[] args)
+[xUnit.net 00:00:00.97]         D:\COMPROG\opentweaks\OpenTweak\Services\PCGWService.cs(150,0): at OpenTweak.Services.PCGWService.GetPageContentAsync(String pageTitle, CancellationToken cancellationToken)
+[xUnit.net 00:00:00.97]         D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs(280,0): at OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_WithValidPage_ReturnsGameInfo()
+[xUnit.net 00:00:00.97]         --- End of stack trace from previous location ---
+[xUnit.net 00:00:00.97]         ----- Inner Stack Trace -----
+[xUnit.net 00:00:00.97]            at System.Net.Http.HttpClient.GetStringAsyncCore(HttpRequestMessage request, CancellationToken cancellationToken)
+[xUnit.net 00:00:00.97]         D:\COMPROG\opentweaks\OpenTweak\Services\PCGWService.cs(117,0): at OpenTweak.Services.PCGWService.GetPageContentAsync(String pageTitle, CancellationToken cancellationToken)
+  Passed OpenTweak.Tests.Services.GameScannerTests.ScanAllLaunchersAsync_ReturnsListOfGames [75 ms]
+  Failed OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_WithValidPage_ReturnsGameInfo [377 ms]
+  Error Message:
+   System.Exception : Allocated Exception inside PCGWService: Handler did not return a response message.
+---- System.InvalidOperationException : Handler did not return a response message.
+  Stack Trace:
+     at OpenTweak.Tests.Services.PCGWServiceTests.<>c.<GetPageContentAsync_WithValidPage_ReturnsGameInfo>b__11_1(IInvocation invocation) in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs:line 273
+   at Moq.Behaviors.Callback.Execute(Invocation invocation) in /_/src/Moq/Behaviors/Callback.cs:line 64
+   at Moq.MethodCall.ExecuteCore(Invocation invocation) in /_/src/Moq/MethodCall.cs:line 224
+   at Moq.Setup.Execute(Invocation invocation) in /_/src/Moq/Setup.cs:line 144
+   at Moq.FindAndExecuteMatchingSetup.Handle(Invocation invocation, Mock mock) in /_/src/Moq/Interception/InterceptionAspects.cs:line 263
+   at Moq.Mock.Moq.IInterceptor.Intercept(Invocation invocation) in /_/src/Moq/Interception/Mock.cs:line 17
+   at Moq.CastleProxyFactory.Interceptor.Intercept(IInvocation underlying) in /_/src/Moq/Interception/CastleProxyFactory.cs:line 218
+   at Castle.DynamicProxy.AbstractInvocation.Proceed()
+   at Castle.Proxies.ILogger`1Proxy_2.Log[TState](LogLevel logLevel, EventId eventId, TState state, Exception exception, Func`3 formatter)
+   at Microsoft.Extensions.Logging.LoggerExtensions.Log(ILogger logger, LogLevel logLevel, EventId eventId, Exception exception, String message, Object[] args)
+   at Microsoft.Extensions.Logging.LoggerExtensions.Log(ILogger logger, LogLevel logLevel, Exception exception, String message, Object[] args)
+   at Microsoft.Extensions.Logging.LoggerExtensions.LogError(ILogger logger, Exception exception, String message, Object[] args)
+   at OpenTweak.Services.PCGWService.GetPageContentAsync(String pageTitle, CancellationToken cancellationToken) in D:\COMPROG\opentweaks\OpenTweak\Services\PCGWService.cs:line 150
+   at OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_WithValidPage_ReturnsGameInfo() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs:line 280
+--- End of stack trace from previous location ---
+----- Inner Stack Trace -----
+   at System.Net.Http.HttpClient.GetStringAsyncCore(HttpRequestMessage request, CancellationToken cancellationToken)
+   at OpenTweak.Services.PCGWService.GetPageContentAsync(String pageTitle, CancellationToken cancellationToken) in D:\COMPROG\opentweaks\OpenTweak\Services\PCGWService.cs:line 117
+  Passed OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_WithEmptyTitle_ReturnsNull [3 ms]
+  Passed OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_WithWhitespaceTitle_ReturnsNull [1 ms]
+  Passed OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_WithNoResults_ReturnsNull [8 ms]
+  Passed OpenTweak.Tests.Services.TweakEngineTests.ApplyTweaksAsync_JsonFile_ModifiesFile [597 ms]
+  Passed OpenTweak.Tests.Services.PCGWServiceTests.GetAvailableTweaksAsync_WithNoTweaks_ReturnsEmptyList [55 ms]
+[xUnit.net 00:00:00.98]       Assert.NotNull() Failure: Value is null
+[xUnit.net 00:00:00.98]       Stack Trace:
+[xUnit.net 00:00:00.98]         D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs(489,0): at OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_ExtractsConfigFilePaths()
+[xUnit.net 00:00:00.98]         --- End of stack trace from previous location ---
+[xUnit.net 00:00:01.01]       Assert.NotNull() Failure: Value is null
+[xUnit.net 00:00:01.01]       Stack Trace:
+[xUnit.net 00:00:01.01]         D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs(83,0): at OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_WithValidGame_ReturnsGameInfo()
+[xUnit.net 00:00:01.01]         --- End of stack trace from previous location ---
+  Failed OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_ExtractsConfigFilePaths [2 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_ExtractsConfigFilePaths() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs:line 489
+--- End of stack trace from previous location ---
+  Passed OpenTweak.Tests.Services.BackupServiceTests.RestoreSnapshotAsync_WithValidSnapshot_RestoresFiles [584 ms]
+  Passed OpenTweak.Tests.Services.DatabaseServiceTests.GetGameByAppId_ReturnsNullForWrongLauncher [638 ms]
+  Passed OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_InvalidJsonResponse_ReturnsNull [31 ms]
+  Failed OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_WithValidGame_ReturnsGameInfo [16 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_WithValidGame_ReturnsGameInfo() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs:line 83
+--- End of stack trace from previous location ---
+  Passed OpenTweak.Tests.Services.GameScannerTests.ScanAllLaunchersAsync_ReturnsConsistentResults [236 ms]
+  Passed OpenTweak.Tests.Services.GameScannerTests.ScanAllLaunchersAsync_GamesHaveInstallPaths [9 ms]
+  Passed OpenTweak.Tests.Services.PCGWServiceTests.GetAvailableTweaksAsync_WithValidGame_ReturnsTweaks [22 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.CreateSnapshotAsync_CreatesMetadataFile [46 ms]
+  Passed OpenTweak.Tests.Services.GameScannerTests.ScanAllLaunchersAsync_HandlesMissingDirectories [8 ms]
+  Passed OpenTweak.Tests.Services.DatabaseServiceTests.GetSnapshotsForGame_ReturnsSnapshotsInOrder [56 ms]
+  Passed OpenTweak.Tests.Services.GameScannerTests.ScanAllLaunchersAsync_GamesHaveNames [14 ms]
+[xUnit.net 00:00:01.08]       Assert.NotNull() Failure: Value is null
+[xUnit.net 00:00:01.08]       Stack Trace:
+[xUnit.net 00:00:01.08]         D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs(233,0): at OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_SkipsCategoryPages()
+[xUnit.net 00:00:01.08]         --- End of stack trace from previous location ---
+  Failed OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_SkipsCategoryPages [52 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_SkipsCategoryPages() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs:line 233
+--- End of stack trace from previous location ---
+  Passed OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_NetworkError_ReturnsNull [3 ms]
+  Passed OpenTweak.Tests.Services.DatabaseServiceTests.GetAllGames_ReturnsAllInsertedGames [45 ms]
+  Passed OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_WithEmptyPageTitle_ReturnsNull [2 ms]
+  Passed OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_HttpError_ReturnsNull [3 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.CreateSnapshotAsync_HandlesExternalPaths [62 ms]
+  Passed OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_MissingParseProperty_ReturnsNull [9 ms]
+[xUnit.net 00:00:01.11]       Assert.NotNull() Failure: Value is null
+[xUnit.net 00:00:01.11]       Stack Trace:
+[xUnit.net 00:00:01.11]         D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs(516,0): at OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_ExtractsSaveGamePaths()
+[xUnit.net 00:00:01.11]         --- End of stack trace from previous location ---
+  Failed OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_ExtractsSaveGamePaths [2 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_ExtractsSaveGamePaths() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs:line 516
+--- End of stack trace from previous location ---
+  Passed OpenTweak.Tests.Services.PCGWServiceTests.GetAvailableTweaksAsync_WithNoResults_ReturnsEmptyList [3 ms]
+  Passed OpenTweak.Tests.Services.GameScannerTests.ScanAllLaunchersAsync_DoesNotThrow [59 ms]
+  Passed OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_WithNullPageTitle_ReturnsNull [< 1 ms]
+  Passed OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_WithNullTitle_ReturnsNull [< 1 ms]
+  Passed OpenTweak.Tests.Services.GameScannerTests.ScanAllLaunchersAsync_GamesHaveValidLauncherTypes [17 ms]
+  Passed OpenTweak.Tests.Services.DatabaseServiceTests.GetRecipesForGame_ReturnsOnlyMatchingRecipes [48 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.CreateSnapshotAsync_CopiesFileContent [40 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.RestoreSnapshotAsync_WithEmptySnapshot_ReturnsTrue [17 ms]
+  Passed OpenTweak.Tests.Services.DatabaseServiceTests.UpsertSnapshot_InsertsNewSnapshot [52 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.RestoreSnapshotAsync_UpdatesSnapshotMetadata [28 ms]
+  Passed OpenTweak.Tests.Services.TweakEngineTests.PreviewTweaksAsync_ExistingFile_ReturnsCurrentValue [283 ms]
+  Passed OpenTweak.Tests.Services.DatabaseServiceTests.DeleteGame_RemovesGame [46 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.GetSnapshotsForGameAsync_IgnoresInvalidMetadata [62 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.CreateSnapshotAsync_HandlesSpecialCharactersInFileContent [28 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.CreateSnapshotAsync_WithNullDescription_UsesDefaultDescription [12 ms]
+  Passed OpenTweak.Tests.Services.DatabaseServiceTests.UpsertGame_UpdatesExistingGame [63 ms]
+  Passed OpenTweak.Tests.Services.TweakEngineTests.ApplyTweaksAsync_CreatesSnapshotBeforeApplying [83 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.CreateSnapshotAsync_WithDescription_SetsDescription [18 ms]
+  Passed OpenTweak.Tests.Services.TweakEngineTests.TweakChange_DefaultValuesAreCorrect [7 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.CreateSnapshotAsync_WithEmptyFileList_CreatesEmptySnapshot [6 ms]
+  Passed OpenTweak.Tests.Services.TweakEngineTests.PreviewTweaksAsync_NonExistentFile_ReturnsNewEntryChange [2 ms]
+  Passed OpenTweak.Tests.Services.TweakEngineTests.ApplyTweaksAsync_WithNoEnabledRecipes_ReturnsEmptyResult [2 ms]
+  Passed OpenTweak.Tests.Services.TweakEngineTests.PreviewTweaksAsync_EmptyFilePathIsSkipped [2 ms]
+  Passed OpenTweak.Tests.Services.TweakEngineTests.PreviewTweaksAsync_WithNullList_ReturnsEmptyList [3 ms]
+  Passed OpenTweak.Tests.Services.DatabaseServiceTests.UpsertGame_InsertsNewGame [39 ms]
+  Passed OpenTweak.Tests.Services.DatabaseServiceTests.UpsertRecipe_InsertsNewRecipe [39 ms]
+  Passed OpenTweak.Tests.Services.DatabaseServiceTests.GetGameByAppId_FindsCorrectGame [41 ms]
+  Passed OpenTweak.Tests.Services.TweakEngineTests.PreviewTweaksAsync_MultipleRecipes_ReturnsMultipleChanges [119 ms]
+  Passed OpenTweak.Tests.Services.DatabaseServiceTests.DeleteSnapshot_RemovesSnapshot [38 ms]
+  Passed OpenTweak.Tests.Services.DatabaseServiceTests.DeleteRecipesForGame_RemovesAllRecipesForGame [43 ms]
+  Passed OpenTweak.Tests.Services.TweakEngineTests.ApplyTweaksAsync_SetsAppliedTweakIdsOnSnapshot [56 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.GetSnapshotsForGameAsync_ReturnsSnapshotsInDescendingOrder [221 ms]
+  Passed OpenTweak.Tests.Services.TweakEngineTests.ApplyTweaksAsync_XmlFile_ModifiesFile [47 ms]
+  Passed OpenTweak.Tests.Services.TweakEngineTests.PreviewTweaksAsync_ExpandsEnvironmentVariables [2 ms]
+  Passed OpenTweak.Tests.Services.TweakEngineTests.TweakChange_PropertiesCanBeSet [1 ms]
+  Passed OpenTweak.Tests.Services.TweakEngineTests.PreviewTweaksAsync_WithEmptyList_ReturnsEmptyList [1 ms]
+  Passed OpenTweak.Tests.Services.TweakEngineTests.ApplyTweaksAsync_IniFile_CreatesNewFile [13 ms]
+  Passed OpenTweak.Tests.Services.TweakEngineTests.ApplyTweaksAsync_HandlesFileAccessErrors [51 ms]
+  Passed OpenTweak.Tests.Services.TweakEngineTests.ApplyTweaksAsync_WithEmptyRecipes_ReturnsEmptyResult [2 ms]
+  Passed OpenTweak.Tests.Services.TweakEngineTests.PreviewTweaksAsync_DisabledRecipesAreSkipped [3 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.CreateSnapshotAsync_HandlesLargeFiles [107 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.RestoreSnapshotAsync_WithMissingBackupPath_ReturnsFalse [2 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.CreateSnapshotAsync_PreservesDirectoryStructure [17 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.CreateSnapshotAsync_HandlesConcurrentSnapshots [15 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.CreateSnapshotAsync_SanitizesGameName [11 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.GetSnapshotsForGameAsync_WithNoSnapshots_ReturnsEmptyList [3 ms]
+[xUnit.net 00:00:01.77]   Finished:    OpenTweak.Tests
+  Passed OpenTweak.Tests.Services.BackupServiceTests.CreateSnapshotAsync_WithNonExistentFile_SkipsFile [29 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.DeleteSnapshot_WithNullBackupPath_ReturnsFalse [8 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.DeleteSnapshot_WithValidSnapshot_DeletesFiles [12 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.DeleteSnapshot_WithNonExistentPath_ReturnsFalse [2 ms]
+  Passed OpenTweak.Tests.Services.BackupServiceTests.CreateSnapshotAsync_WithValidFiles_CreatesSnapshot [13 ms]
+
+Total tests: 83
+     Passed: 78
+     Failed: 5
+ Total time: 2.9370 Seconds
+       _VSTestConsole:
+         MSB4181: The "VSTestTask" task returned false but did not log an error.
+     3>Done Building Project "D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj" (VSTest target(s)) -- FAILED.
+     1>Done Building Project "D:\COMPROG\opentweaks\OpenTweak.sln" (VSTest target(s)) -- FAILED.
+
+Build FAILED.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:14.13

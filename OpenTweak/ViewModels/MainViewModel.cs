@@ -31,6 +31,7 @@ public partial class MainViewModel : ObservableObject
     private readonly IGameScanner _gameScanner;
     private readonly IDatabaseService _databaseService;
     private readonly IPCGWService _pcgwService;
+    private readonly INotificationService _notificationService;
 
     [ObservableProperty]
     private ObservableCollection<Game> _games = new();
@@ -67,11 +68,16 @@ public partial class MainViewModel : ObservableObject
     /// <summary>
     /// Creates a MainViewModel with injected services.
     /// </summary>
-    public MainViewModel(IGameScanner gameScanner, IDatabaseService databaseService, IPCGWService pcgwService)
+    public MainViewModel(
+        IGameScanner gameScanner,
+        IDatabaseService databaseService,
+        IPCGWService pcgwService,
+        INotificationService notificationService)
     {
         _gameScanner = gameScanner;
         _databaseService = databaseService;
         _pcgwService = pcgwService;
+        _notificationService = notificationService;
 
         // Load cached games on startup
         LoadCachedGames();
@@ -127,6 +133,7 @@ public partial class MainViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = $"Scan failed: {ex.Message}";
+            _notificationService.ShowError($"Scan failed: {ex.Message}");
         }
         finally
         {
@@ -194,6 +201,7 @@ public partial class MainViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = $"Wiki fetch failed: {ex.Message}";
+            _notificationService.ShowError($"Wiki fetch failed: {ex.Message}");
         }
         finally
         {
