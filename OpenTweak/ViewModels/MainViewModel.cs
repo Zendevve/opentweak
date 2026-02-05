@@ -7,6 +7,7 @@ using System.IO;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using OpenTweak.Models;
 using OpenTweak.Services;
 
@@ -54,6 +55,9 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _isSlideOverOpen;
+
+    [ObservableProperty]
+    private GameDetailViewModel? _gameDetailViewModel;
 
     public bool IsOfficialBuild => BuildIdentity.IsOfficialBuild;
     public bool IsCommunityBuild => !IsOfficialBuild;
@@ -228,9 +232,14 @@ public partial class MainViewModel : ObservableObject
     /// Opens the slide-over panel for the selected game.
     /// </summary>
     [RelayCommand]
-    public void OpenGameDetails(Game game)
+    public async Task OpenGameDetailsAsync(Game game)
     {
         SelectedGame = game;
+
+        // Create a new GameDetailViewModel from DI and load the game
+        GameDetailViewModel = App.Services.GetRequiredService<GameDetailViewModel>();
+        await GameDetailViewModel.LoadGameAsync(game);
+
         IsSlideOverOpen = true;
     }
 

@@ -4,6 +4,7 @@
 // See LICENSE.md for full terms.
 
 using System.IO;
+using System.Security.Cryptography;
 using OpenTweak.Common;
 using OpenTweak.Models;
 
@@ -249,12 +250,25 @@ public class BackupService : IBackupService
         // Handle paths outside the game directory (e.g., user config folders)
         if (!fullPath.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
         {
-            // Use a hash of the full path to create a unique relative path
-            var hash = fullPath.GetHashCode().ToString("X8");
+            // Use a stable hash of the full path to create a unique relative path
+            // SHA256 ensures the same path always produces the same hash across
+            // .NET versions, machine restarts, and different machines
+            var hash = GetStablePathHash(fullPath);
             return Path.Combine("_external", hash, Path.GetFileName(fullPath));
         }
 
         return Path.GetRelativePath(basePath, fullPath);
+    }
+
+    /// <summary>
+    /// Generates a stable hash for a file path that remains consistent across
+    /// .NET versions and application restarts (unlike string.GetHashCode()).
+    /// </summary>
+    private static string GetStablePathHash(string path)
+    {
+        var bytes = System.Text.Encoding.UTF8.GetBytes(path.ToLowerInvariant());
+        var hash = SHA256.HashData(bytes);
+        return Convert.ToHexString(hash)[..16]; // First 16 hex chars = 8 bytes
     }
 
     private string SanitizeFileName(string name)

@@ -71,7 +71,7 @@ MotionBlur=0
         };
 
         SetupMockResponse("action=query&list=search", JsonSerializer.Serialize(searchResponse));
-        SetupMockResponse("action=parse&page=Test+Game", JsonSerializer.Serialize(pageContent));
+        SetupMockResponse("action=parse&page=Test%20Game", JsonSerializer.Serialize(pageContent));
 
         var service = CreateService();
 
@@ -221,7 +221,7 @@ MotionBlur=0
         };
 
         SetupMockResponse("action=query&list=search", JsonSerializer.Serialize(searchResponse));
-        SetupMockResponse("action=parse&page=Actual+Game", JsonSerializer.Serialize(pageContent));
+        SetupMockResponse("action=parse&page=Actual%20Game", JsonSerializer.Serialize(pageContent));
 
         var service = CreateService();
 
@@ -254,7 +254,7 @@ Save game data location
             }
         };
 
-        SetupMockResponse("action=parse&page=Test+Game", JsonSerializer.Serialize(pageContent));
+        SetupMockResponse("action=parse&page=Test%20Game", JsonSerializer.Serialize(pageContent));
 
         var service = CreateService();
 
@@ -298,7 +298,7 @@ Save game data location
     public async Task GetPageContentAsync_InvalidJsonResponse_ReturnsNull()
     {
         // Arrange
-        SetupMockResponse("action=parse&page=Test+Game", "invalid json");
+        SetupMockResponse("action=parse&page=Test%20Game", "invalid json");
 
         var service = CreateService();
 
@@ -314,7 +314,7 @@ Save game data location
     {
         // Arrange
         var invalidResponse = new { error = new { info = "Invalid page" } };
-        SetupMockResponse("action=parse&page=Test+Game", JsonSerializer.Serialize(invalidResponse));
+        SetupMockResponse("action=parse&page=Test%20Game", JsonSerializer.Serialize(invalidResponse));
 
         var service = CreateService();
 
@@ -367,7 +367,7 @@ Edit {{file|audio.ini}} and set <code>BufferSize=512</code>
         };
 
         SetupMockResponse("action=query&list=search", JsonSerializer.Serialize(searchResponse));
-        SetupMockResponse("action=parse&page=Test+Game", JsonSerializer.Serialize(pageContent));
+        SetupMockResponse("action=parse&page=Test%20Game", JsonSerializer.Serialize(pageContent));
 
         var service = CreateService();
 
@@ -404,7 +404,7 @@ Edit {{file|audio.ini}} and set <code>BufferSize=512</code>
         };
 
         SetupMockResponse("action=query&list=search", JsonSerializer.Serialize(searchResponse));
-        SetupMockResponse("action=parse&page=Test+Game", JsonSerializer.Serialize(pageContent));
+        SetupMockResponse("action=parse&page=Test%20Game", JsonSerializer.Serialize(pageContent));
 
         var service = CreateService();
 
@@ -460,7 +460,7 @@ Edit {{file|audio.ini}} and set <code>BufferSize=512</code>
             }
         };
 
-        SetupMockResponse("action=parse&page=Test+Game", JsonSerializer.Serialize(pageContent));
+        SetupMockResponse("action=parse&page=Test%20Game", JsonSerializer.Serialize(pageContent));
 
         var service = CreateService();
 
@@ -487,7 +487,7 @@ Edit {{file|audio.ini}} and set <code>BufferSize=512</code>
             }
         };
 
-        SetupMockResponse("action=parse&page=Test+Game", JsonSerializer.Serialize(pageContent));
+        SetupMockResponse("action=parse&page=Test%20Game", JsonSerializer.Serialize(pageContent));
 
         var service = CreateService();
 

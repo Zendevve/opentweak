@@ -29,6 +29,8 @@ public partial class App : Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        System.IO.File.AppendAllText("debug_log.txt", "Startup: OnStartup called\n");
+
         // Set up global exception handling to help diagnose crashes
         AppDomain.CurrentDomain.UnhandledException += (s, args) =>
         {
@@ -60,9 +62,24 @@ public partial class App : Application
         // Apply system theme (follows Windows dark/light mode)
         ApplicationThemeManager.ApplySystemTheme();
 
-        // Now create and show the main window (after services are ready)
-        var mainWindow = new Views.MainWindow();
-        mainWindow.Show();
+        // Debug logging
+        System.IO.File.AppendAllText("debug_log.txt", "Startup: Services Configured\n");
+
+        try
+        {
+            // Now create and show the main window (after services are ready)
+            var mainWindow = new Views.MainWindow();
+            System.IO.File.AppendAllText("debug_log.txt", "Startup: MainWindow Created\n");
+
+            mainWindow.Show();
+            System.IO.File.AppendAllText("debug_log.txt", "Startup: MainWindow Shown\n");
+        }
+        catch (Exception ex)
+        {
+             System.IO.File.AppendAllText("debug_log.txt", $"Startup Error: {ex}\n");
+             MessageBox.Show(ex.ToString());
+             throw;
+        }
     }
 
     private static void ConfigureServices(IServiceCollection services)

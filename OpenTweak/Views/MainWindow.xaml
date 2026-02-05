@@ -300,15 +300,9 @@
                     </Button>
 
                     <!-- Game Detail Content -->
-                    <ContentControl Grid.Row="1"
-                                    Content="{Binding SelectedGame}"
-                                    Visibility="{Binding SelectedGame, Converter={StaticResource NotNullToVisibilityConverter}}">
-                        <ContentControl.ContentTemplate>
-                            <DataTemplate DataType="{x:Type models:Game}">
-                                <views:GameDetailView DataContext="{Binding}"/>
-                            </DataTemplate>
-                        </ContentControl.ContentTemplate>
-                    </ContentControl>
+                    <views:GameDetailView Grid.Row="1"
+                                          DataContext="{Binding GameDetailViewModel}"
+                                          Visibility="{Binding GameDetailViewModel, Converter={StaticResource NotNullToVisibilityConverter}}"/>
                 </Grid>
             </Border>
 

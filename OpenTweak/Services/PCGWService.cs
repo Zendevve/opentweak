@@ -21,22 +21,27 @@ namespace OpenTweak.Services;
 /// </summary>
 public class PCGWService : IPCGWService
 {
+    private const string BaseUrl = "https://www.pcgamingwiki.com/w/api.php";
+    private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(30);
+
     // Static HttpClient is the recommended pattern per Microsoft guidelines
     // https://learn.microsoft.com/en-us/dotnet/fundamentals/networking/http/httpclient-guidelines
-    private static readonly HttpClient SharedHttpClient;
-    private readonly HttpClient _httpClient;
-    private readonly string _baseUrl = "https://www.pcgamingwiki.com/w/api.php";
+    private static readonly HttpClient s_sharedClient = CreateDefaultClient();
 
-    static PCGWService()
+    // Instance client allows dependency injection for testing
+    private readonly HttpClient _client;
+
+    private static HttpClient CreateDefaultClient()
     {
-        SharedHttpClient = new HttpClient();
-        SharedHttpClient.DefaultRequestHeaders.Add("User-Agent", "OpenTweak/1.0 (Automated Game Tweaks)");
+        var client = new HttpClient { Timeout = DefaultTimeout };
+        client.DefaultRequestHeaders.Add("User-Agent", "OpenTweak/1.0 (Automated Game Tweaks)");
+        return client;
     }
 
     /// <summary>
     /// Creates a new PCGWService using the shared HttpClient.
     /// </summary>
-    public PCGWService() : this(SharedHttpClient)
+    public PCGWService() : this(s_sharedClient)
     {
     }
 
@@ -45,7 +50,7 @@ public class PCGWService : IPCGWService
     /// </summary>
     public PCGWService(HttpClient httpClient)
     {
-        _httpClient = httpClient;
+        _client = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
     }
 
     #region Public API Methods
@@ -58,8 +63,8 @@ public class PCGWService : IPCGWService
         try
         {
             // Search for the game
-            var searchUrl = $"{_baseUrl}?action=query&list=search&srsearch={Uri.EscapeDataString(gameTitle)}&format=json&srlimit=5";
-            var searchResponse = await _httpClient.GetStringAsync(searchUrl);
+            var searchUrl = $"{BaseUrl}?action=query&list=search&srsearch={Uri.EscapeDataString(gameTitle)}&format=json&srlimit=5";
+            var searchResponse = await _client.GetStringAsync(searchUrl);
             var searchData = JsonSerializer.Deserialize<JsonElement>(searchResponse);
 
             if (!searchData.TryGetProperty("query", out var query) ||
@@ -103,8 +108,8 @@ public class PCGWService : IPCGWService
         try
         {
             // Get the wiki page content
-            var contentUrl = $"{_baseUrl}?action=parse&page={Uri.EscapeDataString(pageTitle)}&prop=wikitext&format=json";
-            var contentResponse = await _httpClient.GetStringAsync(contentUrl);
+            var contentUrl = $"{BaseUrl}?action=parse&page={Uri.EscapeDataString(pageTitle)}&prop=wikitext&format=json";
+            var contentResponse = await _client.GetStringAsync(contentUrl);
             var contentData = JsonSerializer.Deserialize<JsonElement>(contentResponse);
 
             if (!contentData.TryGetProperty("parse", out var parse) ||
