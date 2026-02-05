@@ -58,13 +58,13 @@ public class PCGWService : IPCGWService
     /// <summary>
     /// Searches for a game on PCGamingWiki and returns basic info.
     /// </summary>
-    public async Task<PCGWGameInfo?> SearchGameAsync(string gameTitle)
+    public async Task<PCGWGameInfo?> SearchGameAsync(string gameTitle, CancellationToken cancellationToken = default)
     {
         try
         {
             // Search for the game
             var searchUrl = $"{BaseUrl}?action=query&list=search&srsearch={Uri.EscapeDataString(gameTitle)}&format=json&srlimit=5";
-            var searchResponse = await _client.GetStringAsync(searchUrl);
+            var searchResponse = await _client.GetStringAsync(searchUrl, cancellationToken);
             var searchData = JsonSerializer.Deserialize<JsonElement>(searchResponse);
 
             if (!searchData.TryGetProperty("query", out var query) ||
@@ -76,6 +76,8 @@ public class PCGWService : IPCGWService
             // Find the best match
             foreach (var result in searchResults.EnumerateArray())
             {
+                if (cancellationToken.IsCancellationRequested) break;
+
                 var title = result.GetProperty("title").GetString();
                 if (string.IsNullOrEmpty(title)) continue;
 
@@ -83,7 +85,7 @@ public class PCGWService : IPCGWService
                 if (!title.StartsWith("Category:") && !title.StartsWith("File:"))
                 {
                     // Get full page content
-                    var pageInfo = await GetPageContentAsync(title);
+                    var pageInfo = await GetPageContentAsync(title, cancellationToken);
                     if (pageInfo != null)
                     {
                         return pageInfo;
@@ -103,13 +105,13 @@ public class PCGWService : IPCGWService
     /// <summary>
     /// Gets detailed information about a game including all fix instructions.
     /// </summary>
-    public async Task<PCGWGameInfo?> GetPageContentAsync(string pageTitle)
+    public async Task<PCGWGameInfo?> GetPageContentAsync(string pageTitle, CancellationToken cancellationToken = default)
     {
         try
         {
             // Get the wiki page content
             var contentUrl = $"{BaseUrl}?action=parse&page={Uri.EscapeDataString(pageTitle)}&prop=wikitext&format=json";
-            var contentResponse = await _client.GetStringAsync(contentUrl);
+            var contentResponse = await _client.GetStringAsync(contentUrl, cancellationToken);
             var contentData = JsonSerializer.Deserialize<JsonElement>(contentResponse);
 
             if (!contentData.TryGetProperty("parse", out var parse) ||
@@ -150,9 +152,9 @@ public class PCGWService : IPCGWService
     /// <summary>
     /// Gets available tweaks for a specific game.
     /// </summary>
-    public async Task<List<TweakRecipe>> GetAvailableTweaksAsync(string gameTitle, Guid gameId)
+    public async Task<List<TweakRecipe>> GetAvailableTweaksAsync(string gameTitle, Guid gameId, CancellationToken cancellationToken = default)
     {
-        var gameInfo = await SearchGameAsync(gameTitle);
+        var gameInfo = await SearchGameAsync(gameTitle, cancellationToken);
         if (gameInfo?.AvailableTweaks == null)
         {
             return new List<TweakRecipe>();
@@ -161,6 +163,7 @@ public class PCGWService : IPCGWService
         // Update the GameId in all recipes
         foreach (var tweak in gameInfo.AvailableTweaks)
         {
+            if (cancellationToken.IsCancellationRequested) break;
             tweak.GameId = gameId;
         }
 

@@ -1,0 +1,21 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  OpenTweak -> D:\COMPROG\opentweaks\OpenTweak\bin\Debug\net8.0-windows\OpenTweak.dll
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(111,35): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(132,24): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(154,41): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(177,45): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(222,23): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(245,38): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(271,41): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\TweakEngineTests.cs(324,40): error CS0854: An expression tree may not contain a call or invocation that uses optional arguments [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(297,43): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(332,64): warning CS8604: Possible null reference argument for parameter 'snapshot' in 'Task<bool> BackupService.RestoreSnapshotAsync(Snapshot snapshot, Game game, CancellationToken cancellationToken = default(CancellationToken))'. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(382,64): warning CS8604: Possible null reference argument for parameter 'snapshot' in 'Task<bool> BackupService.RestoreSnapshotAsync(Snapshot snapshot, Game game, CancellationToken cancellationToken = default(CancellationToken))'. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(403,22): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(479,41): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(508,38): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(550,9): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(585,65): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(607,23): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(633,45): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]

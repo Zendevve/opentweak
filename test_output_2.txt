@@ -1,0 +1,65 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  OpenTweak -> D:\COMPROG\opentweaks\OpenTweak\bin\Debug\net8.0-windows\OpenTweak.dll
+  OpenTweak.Tests -> D:\COMPROG\opentweaks\OpenTweak.Tests\bin\Debug\net8.0-windows\OpenTweak.Tests.dll
+Test run for D:\COMPROG\opentweaks\OpenTweak.Tests\bin\Debug\net8.0-windows\OpenTweak.Tests.dll (.NETCoreApp,Version=v8.0)
+VSTest version 17.11.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+  Failed OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_WithValidPage_ReturnsGameInfo [450 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_WithValidPage_ReturnsGameInfo() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs:line 265
+--- End of stack trace from previous location ---
+  Failed OpenTweak.Tests.Services.TweakEngineTests.ApplyTweaksAsync_JsonFile_ModifiesFile [528 ms]
+  Error Message:
+   Assert.True() Failure
+Expected: True
+Actual:   False
+  Stack Trace:
+     at OpenTweak.Tests.Services.TweakEngineTests.ApplyTweaksAsync_JsonFile_ModifiesFile() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\TweakEngineTests.cs:line 503
+--- End of stack trace from previous location ---
+  Failed OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_ExtractsConfigFilePaths [2 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_ExtractsConfigFilePaths() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs:line 471
+--- End of stack trace from previous location ---
+  Failed OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_WithValidGame_ReturnsGameInfo [10 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_WithValidGame_ReturnsGameInfo() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs:line 82
+--- End of stack trace from previous location ---
+  Failed OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_SkipsCategoryPages [5 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_SkipsCategoryPages() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs:line 232
+--- End of stack trace from previous location ---
+  Failed OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_ExtractsSaveGamePaths [2 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_ExtractsSaveGamePaths() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs:line 498
+--- End of stack trace from previous location ---
+  Failed OpenTweak.Tests.Services.TweakEngineTests.ApplyTweaksAsync_SetsAppliedTweakIdsOnSnapshot [36 ms]
+  Error Message:
+   Assert.Contains() Failure: Item not found in collection
+Collection: []
+Not found:  514e9e29-c63a-4b93-ba38-d62088be1448
+  Stack Trace:
+     at OpenTweak.Tests.Services.TweakEngineTests.ApplyTweaksAsync_SetsAppliedTweakIdsOnSnapshot() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\TweakEngineTests.cs:line 422
+--- End of stack trace from previous location ---
+  Failed OpenTweak.Tests.Services.TweakEngineTests.ApplyTweaksAsync_XmlFile_ModifiesFile [57 ms]
+  Error Message:
+   Assert.True() Failure
+Expected: True
+Actual:   False
+  Stack Trace:
+     at OpenTweak.Tests.Services.TweakEngineTests.ApplyTweaksAsync_XmlFile_ModifiesFile() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\TweakEngineTests.cs:line 537
+--- End of stack trace from previous location ---
+
+Failed!  - Failed:     8, Passed:    75, Skipped:     0, Total:    83, Duration: 1 s - OpenTweak.Tests.dll (net8.0)

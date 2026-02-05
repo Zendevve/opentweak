@@ -21,19 +21,29 @@ public class GameScanner : IGameScanner
     /// <summary>
     /// Scans all supported launchers and returns detected games.
     /// </summary>
-    public async Task<List<Game>> ScanAllLaunchersAsync()
+    public async Task<List<Game>> ScanAllLaunchersAsync(CancellationToken cancellationToken = default)
     {
         _detectedGames.Clear();
 
+        if (cancellationToken.IsCancellationRequested)
+            return _detectedGames;
+
         var tasks = new List<Task>
         {
-            Task.Run(ScanSteam),
-            Task.Run(ScanEpicGames),
-            Task.Run(ScanGOG),
-            Task.Run(ScanXbox)
+            Task.Run(() => ScanSteam(cancellationToken), cancellationToken),
+            Task.Run(() => ScanEpicGames(cancellationToken), cancellationToken),
+            Task.Run(() => ScanGOG(cancellationToken), cancellationToken),
+            Task.Run(() => ScanXbox(cancellationToken), cancellationToken)
         };
 
-        await Task.WhenAll(tasks);
+        try
+        {
+            await Task.WhenAll(tasks);
+        }
+        catch (OperationCanceledException)
+        {
+            // Ignore cancellation exceptions
+        }
 
         return _detectedGames.OrderBy(g => g.Name).ToList();
     }
@@ -43,7 +53,7 @@ public class GameScanner : IGameScanner
     /// <summary>
     /// Scans Steam libraries by parsing libraryfolders.vdf and appmanifest files.
     /// </summary>
-    private void ScanSteam()
+    private void ScanSteam(CancellationToken cancellationToken)
     {
         try
         {
@@ -51,6 +61,8 @@ public class GameScanner : IGameScanner
 
             foreach (var libraryPath in steamPaths)
             {
+                if (cancellationToken.IsCancellationRequested) return;
+
                 var steamAppsPath = Path.Combine(libraryPath, "steamapps");
                 if (!Directory.Exists(steamAppsPath)) continue;
 
@@ -58,6 +70,8 @@ public class GameScanner : IGameScanner
 
                 foreach (var manifest in manifestFiles)
                 {
+                    if (cancellationToken.IsCancellationRequested) return;
+
                     var game = ParseSteamManifest(manifest, steamAppsPath);
                     if (game != null)
                     {
@@ -157,7 +171,7 @@ public class GameScanner : IGameScanner
     /// <summary>
     /// Scans Epic Games by parsing .item manifest files.
     /// </summary>
-    private void ScanEpicGames()
+    private void ScanEpicGames(CancellationToken cancellationToken)
     {
         try
         {
@@ -171,6 +185,8 @@ public class GameScanner : IGameScanner
 
             foreach (var itemFile in itemFiles)
             {
+                if (cancellationToken.IsCancellationRequested) return;
+
                 var game = ParseEpicManifest(itemFile);
                 if (game != null)
                 {
@@ -230,7 +246,7 @@ public class GameScanner : IGameScanner
     /// <summary>
     /// Scans GOG Galaxy by reading registry keys.
     /// </summary>
-    private void ScanGOG()
+    private void ScanGOG(CancellationToken cancellationToken)
     {
         try
         {
@@ -243,11 +259,15 @@ public class GameScanner : IGameScanner
 
             foreach (var regPath in registryPaths)
             {
+                if (cancellationToken.IsCancellationRequested) return;
+
                 using var gamesKey = Registry.LocalMachine.OpenSubKey(regPath);
                 if (gamesKey == null) continue;
 
                 foreach (var gameIdStr in gamesKey.GetSubKeyNames())
                 {
+                    if (cancellationToken.IsCancellationRequested) return;
+
                     using var gameKey = gamesKey.OpenSubKey(gameIdStr);
                     if (gameKey == null) continue;
 
@@ -288,7 +308,7 @@ public class GameScanner : IGameScanner
     /// <summary>
     /// Scans Xbox/Microsoft Store games (basic implementation).
     /// </summary>
-    private void ScanXbox()
+    private void ScanXbox(CancellationToken cancellationToken)
     {
         try
         {
@@ -302,6 +322,7 @@ public class GameScanner : IGameScanner
 
             foreach (var basePath in xboxPaths)
             {
+                if (cancellationToken.IsCancellationRequested) return;
                 if (!Directory.Exists(basePath)) continue;
 
                 // XboxGames folder has a simpler structure
@@ -309,6 +330,8 @@ public class GameScanner : IGameScanner
                 {
                     foreach (var gameDir in Directory.GetDirectories(basePath))
                     {
+                        if (cancellationToken.IsCancellationRequested) return;
+
                         var contentDir = Path.Combine(gameDir, "Content");
                         if (Directory.Exists(contentDir))
                         {

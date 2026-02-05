@@ -18,12 +18,19 @@ public class BackupService : IBackupService
 {
     private readonly string _backupBasePath;
 
-    public BackupService()
+    public BackupService(string? backupBasePath = null)
     {
-        // Store backups in AppData to avoid cluttering game directories
-        _backupBasePath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "OpenTweak", "Backups");
+        if (string.IsNullOrEmpty(backupBasePath))
+        {
+            // Store backups in AppData to avoid cluttering game directories
+            _backupBasePath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "OpenTweak", "Backups");
+        }
+        else
+        {
+            _backupBasePath = backupBasePath;
+        }
 
         Directory.CreateDirectory(_backupBasePath);
     }
@@ -31,11 +38,11 @@ public class BackupService : IBackupService
     /// <summary>
     /// Creates a snapshot of files before applying tweaks.
     /// </summary>
-    public async Task<Snapshot> CreateSnapshotAsync(Game game, IEnumerable<string> filesToBackup, string? description = null)
+    public async Task<Snapshot?> CreateSnapshotAsync(Game game, IEnumerable<string> filesToBackup, string? description = null, CancellationToken cancellationToken = default)
     {
         var timestamp = DateTime.UtcNow;
         var safeGameName = SanitizeFileName(game.Name);
-        var backupFolder = Path.Combine(_backupBasePath, safeGameName, timestamp.ToString("yyyy-MM-dd_HH-mm-ss"));
+        var backupFolder = Path.Combine(_backupBasePath, safeGameName, timestamp.ToString("yyyy-MM-dd_HH-mm-ss-fff"));
 
         Directory.CreateDirectory(backupFolder);
 
@@ -49,6 +56,7 @@ public class BackupService : IBackupService
 
         foreach (var filePath in filesToBackup)
         {
+            if (cancellationToken.IsCancellationRequested) return null;
             if (!File.Exists(filePath)) continue;
 
             try
@@ -63,7 +71,7 @@ public class BackupService : IBackupService
                     Directory.CreateDirectory(backupDir);
 
                 // Copy the file
-                await CopyFileAsync(filePath, backupFilePath);
+                await CopyFileAsync(filePath, backupFilePath, cancellationToken);
 
                 snapshot.FilesBackedUp.Add(filePath);
             }
@@ -74,7 +82,7 @@ public class BackupService : IBackupService
         }
 
         // Save snapshot metadata
-        await SaveSnapshotMetadataAsync(snapshot);
+        await SaveSnapshotMetadataAsync(snapshot, cancellationToken);
 
         return snapshot;
     }
@@ -82,7 +90,7 @@ public class BackupService : IBackupService
     /// <summary>
     /// Restores files from a snapshot.
     /// </summary>
-    public async Task<bool> RestoreSnapshotAsync(Snapshot snapshot, Game game)
+    public async Task<bool> RestoreSnapshotAsync(Snapshot snapshot, Game game, CancellationToken cancellationToken = default)
     {
         if (!Directory.Exists(snapshot.BackupPath))
             return false;
@@ -91,6 +99,8 @@ public class BackupService : IBackupService
 
         foreach (var originalPath in snapshot.FilesBackedUp)
         {
+            if (cancellationToken.IsCancellationRequested) return false;
+
             try
             {
                 var relativePath = GetRelativePath(originalPath, game.InstallPath);
@@ -99,7 +109,7 @@ public class BackupService : IBackupService
                 if (!File.Exists(backupFilePath)) continue;
 
                 // Restore the file
-                await CopyFileAsync(backupFilePath, originalPath);
+                await CopyFileAsync(backupFilePath, originalPath, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -111,7 +121,7 @@ public class BackupService : IBackupService
         // Update snapshot status
         snapshot.WasRestored = true;
         snapshot.RestoredDate = DateTime.UtcNow;
-        await SaveSnapshotMetadataAsync(snapshot);
+        await SaveSnapshotMetadataAsync(snapshot, cancellationToken);
 
         return success;
     }
@@ -119,7 +129,7 @@ public class BackupService : IBackupService
     /// <summary>
     /// Restores files from a snapshot with detailed error information.
     /// </summary>
-    public async Task<Result> RestoreSnapshotWithResultAsync(Snapshot snapshot, Game game)
+    public async Task<Result> RestoreSnapshotWithResultAsync(Snapshot snapshot, Game game, CancellationToken cancellationToken = default)
     {
         if (!Directory.Exists(snapshot.BackupPath))
             return Result.Failure($"Backup directory not found: {snapshot.BackupPath}");
@@ -128,6 +138,8 @@ public class BackupService : IBackupService
 
         foreach (var originalPath in snapshot.FilesBackedUp)
         {
+            if (cancellationToken.IsCancellationRequested) return Result.Failure("Operation cancelled");
+
             try
             {
                 var relativePath = GetRelativePath(originalPath, game.InstallPath);
@@ -139,7 +151,7 @@ public class BackupService : IBackupService
                     continue;
                 }
 
-                await CopyFileAsync(backupFilePath, originalPath);
+                await CopyFileAsync(backupFilePath, originalPath, cancellationToken);
             }
             catch (UnauthorizedAccessException)
             {
@@ -159,7 +171,7 @@ public class BackupService : IBackupService
         // Update snapshot status
         snapshot.WasRestored = true;
         snapshot.RestoredDate = DateTime.UtcNow;
-        await SaveSnapshotMetadataAsync(snapshot);
+        await SaveSnapshotMetadataAsync(snapshot, cancellationToken);
 
         if (failedFiles.Count > 0)
         {
@@ -174,7 +186,7 @@ public class BackupService : IBackupService
     /// <summary>
     /// Gets all snapshots for a game.
     /// </summary>
-    public async Task<List<Snapshot>> GetSnapshotsForGameAsync(Game game)
+    public async Task<List<Snapshot>> GetSnapshotsForGameAsync(Game game, CancellationToken cancellationToken = default)
     {
         var snapshots = new List<Snapshot>();
         var safeGameName = SanitizeFileName(game.Name);
@@ -185,12 +197,14 @@ public class BackupService : IBackupService
 
         foreach (var snapshotDir in Directory.GetDirectories(gameBackupPath))
         {
+            if (cancellationToken.IsCancellationRequested) break;
+
             var metadataPath = Path.Combine(snapshotDir, "snapshot.json");
             if (File.Exists(metadataPath))
             {
                 try
                 {
-                    var json = await File.ReadAllTextAsync(metadataPath);
+                    var json = await File.ReadAllTextAsync(metadataPath, cancellationToken);
                     var snapshot = System.Text.Json.JsonSerializer.Deserialize<Snapshot>(json);
                     if (snapshot != null)
                         snapshots.Add(snapshot);
@@ -228,21 +242,21 @@ public class BackupService : IBackupService
 
     #region Private Helpers
 
-    private async Task SaveSnapshotMetadataAsync(Snapshot snapshot)
+    private async Task SaveSnapshotMetadataAsync(Snapshot snapshot, CancellationToken cancellationToken)
     {
         var metadataPath = Path.Combine(snapshot.BackupPath, "snapshot.json");
         var json = System.Text.Json.JsonSerializer.Serialize(snapshot, new System.Text.Json.JsonSerializerOptions
         {
             WriteIndented = true
         });
-        await File.WriteAllTextAsync(metadataPath, json);
+        await File.WriteAllTextAsync(metadataPath, json, cancellationToken);
     }
 
-    private async Task CopyFileAsync(string source, string destination)
+    private async Task CopyFileAsync(string source, string destination, CancellationToken cancellationToken)
     {
         using var sourceStream = new FileStream(source, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true);
         using var destStream = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true);
-        await sourceStream.CopyToAsync(destStream);
+        await sourceStream.CopyToAsync(destStream, cancellationToken);
     }
 
     private string GetRelativePath(string fullPath, string basePath)

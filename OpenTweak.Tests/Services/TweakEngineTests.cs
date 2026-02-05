@@ -252,7 +252,7 @@ public class TweakEngineTests : IDisposable
     #region ApplyTweaksAsync Tests
 
     [Fact]
-    public async Task ApplyTweaksAsync_WithNoEnabledRecipes_ReturnsNull()
+    public async Task ApplyTweaksAsync_WithNoEnabledRecipes_ReturnsEmptyResult()
     {
         // Arrange
         var game = new Game { Id = Guid.NewGuid(), Name = "Test Game", InstallPath = _tempDirectory };
@@ -265,11 +265,13 @@ public class TweakEngineTests : IDisposable
         var result = await _tweakEngine.ApplyTweaksAsync(game, recipes);
 
         // Assert
-        Assert.Null(result);
+        Assert.NotNull(result);
+        Assert.Empty(result.SuccessfulTweaks);
+        Assert.Empty(result.FailedTweaks);
     }
 
     [Fact]
-    public async Task ApplyTweaksAsync_WithEmptyRecipes_ReturnsNull()
+    public async Task ApplyTweaksAsync_WithEmptyRecipes_ReturnsEmptyResult()
     {
         // Arrange
         var game = new Game { Id = Guid.NewGuid(), Name = "Test Game", InstallPath = _tempDirectory };
@@ -279,7 +281,9 @@ public class TweakEngineTests : IDisposable
         var result = await _tweakEngine.ApplyTweaksAsync(game, recipes);
 
         // Assert
-        Assert.Null(result);
+        Assert.NotNull(result);
+        Assert.Empty(result.SuccessfulTweaks);
+        Assert.Empty(result.FailedTweaks);
     }
 
     [Fact]
@@ -299,7 +303,7 @@ public class TweakEngineTests : IDisposable
         };
 
         _mockBackupService
-            .Setup(x => x.CreateSnapshotAsync(game, It.IsAny<List<string>>(), It.IsAny<string>()))
+            .Setup(x => x.CreateSnapshotAsync(game, It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(snapshot);
 
         var recipes = new List<TweakRecipe>
@@ -321,7 +325,7 @@ public class TweakEngineTests : IDisposable
 
         // Assert
         Assert.NotNull(result);
-        _mockBackupService.Verify(x => x.CreateSnapshotAsync(game, It.IsAny<List<string>>(), It.IsAny<string>()), Times.Once);
+        _mockBackupService.Verify(x => x.CreateSnapshotAsync(game, It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -340,7 +344,7 @@ public class TweakEngineTests : IDisposable
         };
 
         _mockBackupService
-            .Setup(x => x.CreateSnapshotAsync(game, It.IsAny<List<string>>(), It.IsAny<string>()))
+            .Setup(x => x.CreateSnapshotAsync(game, It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(snapshot);
 
         var recipes = new List<TweakRecipe>
@@ -384,7 +388,7 @@ public class TweakEngineTests : IDisposable
         };
 
         _mockBackupService
-            .Setup(x => x.CreateSnapshotAsync(game, It.IsAny<List<string>>(), It.IsAny<string>()))
+            .Setup(x => x.CreateSnapshotAsync(game, It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(snapshot);
 
         var recipes = new List<TweakRecipe>
@@ -414,8 +418,11 @@ public class TweakEngineTests : IDisposable
 
         // Assert
         Assert.NotNull(result);
-        Assert.Contains(recipeId1, result.AppliedTweakIds);
-        Assert.Contains(recipeId2, result.AppliedTweakIds);
+        Assert.NotNull(result.Snapshot);
+        Assert.True(result.Snapshot.AppliedTweakIds.Any(), "No tweak IDs applied. Failures: " + string.Join(", ", result.FailedTweaks.Select(x => x.ErrorMessage)));
+
+        Assert.Contains(recipeId1, result.Snapshot.AppliedTweakIds);
+        Assert.Contains(recipeId2, result.Snapshot.AppliedTweakIds);
     }
 
     [Fact]
@@ -436,7 +443,7 @@ public class TweakEngineTests : IDisposable
         };
 
         _mockBackupService
-            .Setup(x => x.CreateSnapshotAsync(game, It.IsAny<List<string>>(), It.IsAny<string>()))
+            .Setup(x => x.CreateSnapshotAsync(game, It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(snapshot);
 
         var recipes = new List<TweakRecipe>
@@ -464,6 +471,76 @@ public class TweakEngineTests : IDisposable
 
         // Assert
         Assert.Null(exception);
+    }
+
+    [Fact]
+    public async Task ApplyTweaksAsync_JsonFile_ModifiesFile()
+    {
+        // Arrange
+        var game = new Game { Id = Guid.NewGuid(), Name = "Test Game", InstallPath = _tempDirectory };
+        var configPath = Path.Combine(_tempDirectory, "config.json");
+        await File.WriteAllTextAsync(configPath, "{ \"Graphics\": { \"MotionBlur\": true } }");
+
+        var snapshot = new Snapshot { Id = Guid.NewGuid(), GameId = game.Id, BackupPath = Path.Combine(_tempDirectory, "backup"), FilesBackedUp = new List<string>() };
+        _mockBackupService.Setup(x => x.CreateSnapshotAsync(game, It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(snapshot);
+
+        var recipes = new List<TweakRecipe>
+        {
+            new TweakRecipe
+            {
+                Id = Guid.NewGuid(),
+                IsEnabled = true,
+                FilePath = configPath,
+                Section = "Graphics",
+                Key = "MotionBlur",
+                Value = "false",
+                TargetType = TweakTargetType.JsonFile
+            }
+        };
+
+        // Act
+        var result = await _tweakEngine.ApplyTweaksAsync(game, recipes);
+
+        // Assert
+        Assert.True(result.AllSucceeded, string.Join(", ", result.FailedTweaks.Select(f => f.ErrorMessage + (f.Exception != null ? ": " + f.Exception.Message : ""))));
+        var content = await File.ReadAllTextAsync(configPath);
+        Assert.Contains("false", content);
+    }
+
+    [Fact]
+    public async Task ApplyTweaksAsync_XmlFile_ModifiesFile()
+    {
+        // Arrange
+        var game = new Game { Id = Guid.NewGuid(), Name = "Test Game", InstallPath = _tempDirectory };
+        var configPath = Path.Combine(_tempDirectory, "config.xml");
+        await File.WriteAllTextAsync(configPath, "<Configuration><Graphics><MotionBlur>true</MotionBlur></Graphics></Configuration>");
+
+        var snapshot = new Snapshot { Id = Guid.NewGuid(), GameId = game.Id, BackupPath = Path.Combine(_tempDirectory, "backup"), FilesBackedUp = new List<string>() };
+        _mockBackupService.Setup(x => x.CreateSnapshotAsync(game, It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(snapshot);
+
+        var recipes = new List<TweakRecipe>
+        {
+            new TweakRecipe
+            {
+                Id = Guid.NewGuid(),
+                IsEnabled = true,
+                FilePath = configPath,
+                Section = "Graphics",
+                Key = "MotionBlur",
+                Value = "false",
+                TargetType = TweakTargetType.XmlFile
+            }
+        };
+
+        // Act
+        var result = await _tweakEngine.ApplyTweaksAsync(game, recipes);
+
+        // Assert
+        Assert.True(result.AllSucceeded, string.Join(", ", result.FailedTweaks.Select(f => f.ErrorMessage + (f.Exception != null ? ": " + f.Exception.Message : ""))));
+
+
+        var content = await File.ReadAllTextAsync(configPath);
+        Assert.Contains("false", content);
     }
 
     #endregion

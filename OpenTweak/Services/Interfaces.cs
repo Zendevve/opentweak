@@ -5,6 +5,8 @@
 
 using OpenTweak.Models;
 
+using System.Threading;
+
 namespace OpenTweak.Services;
 
 /// <summary>
@@ -15,7 +17,7 @@ public interface IGameScanner
     /// <summary>
     /// Scans all supported launchers for installed games.
     /// </summary>
-    Task<List<Game>> ScanAllLaunchersAsync();
+    Task<List<Game>> ScanAllLaunchersAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Adds a game manually by path.
@@ -31,17 +33,17 @@ public interface IPCGWService
     /// <summary>
     /// Searches for a game on PCGamingWiki.
     /// </summary>
-    Task<PCGWGameInfo?> SearchGameAsync(string gameTitle);
+    Task<PCGWGameInfo?> SearchGameAsync(string gameTitle, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets page content from PCGamingWiki.
     /// </summary>
-    Task<PCGWGameInfo?> GetPageContentAsync(string pageTitle);
+    Task<PCGWGameInfo?> GetPageContentAsync(string pageTitle, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets available tweaks for a game.
     /// </summary>
-    Task<List<TweakRecipe>> GetAvailableTweaksAsync(string gameTitle, Guid gameId);
+    Task<List<TweakRecipe>> GetAvailableTweaksAsync(string gameTitle, Guid gameId, CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -52,12 +54,12 @@ public interface ITweakEngine
     /// <summary>
     /// Previews what changes will be made by the tweaks.
     /// </summary>
-    Task<List<TweakEngine.TweakChange>> PreviewTweaksAsync(IEnumerable<TweakRecipe> recipes);
+    Task<List<TweakEngine.TweakChange>> PreviewTweaksAsync(IEnumerable<TweakRecipe> recipes, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Applies tweaks to a game, creating a backup first.
     /// </summary>
-    Task<Snapshot?> ApplyTweaksAsync(Game game, IEnumerable<TweakRecipe> recipes);
+    Task<TweakApplicationResult> ApplyTweaksAsync(Game game, IEnumerable<TweakRecipe> recipes, CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -68,22 +70,22 @@ public interface IBackupService
     /// <summary>
     /// Creates a snapshot of the specified files.
     /// </summary>
-    Task<Snapshot> CreateSnapshotAsync(Game game, IEnumerable<string> filesToBackup, string? description = null);
+    Task<Snapshot?> CreateSnapshotAsync(Game game, IEnumerable<string> filesToBackup, string? description = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Restores files from a snapshot.
     /// </summary>
-    Task<bool> RestoreSnapshotAsync(Snapshot snapshot, Game game);
+    Task<bool> RestoreSnapshotAsync(Snapshot snapshot, Game game, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Restores files from a snapshot with detailed error information.
     /// </summary>
-    Task<Common.Result> RestoreSnapshotWithResultAsync(Snapshot snapshot, Game game);
+    Task<Common.Result> RestoreSnapshotWithResultAsync(Snapshot snapshot, Game game, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets all snapshots for a game.
     /// </summary>
-    Task<List<Snapshot>> GetSnapshotsForGameAsync(Game game);
+    Task<List<Snapshot>> GetSnapshotsForGameAsync(Game game, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes a snapshot and its backup files.

@@ -48,6 +48,11 @@ public class TweakRecipe
     public Guid GameId { get; set; }
 
     /// <summary>
+    /// The name of the tweak (e.g. "Disable Motion Blur").
+    /// </summary>
+    public string Name { get; set; } = string.Empty;
+
+    /// <summary>
     /// Category from PCGW (Video, Audio, Input, etc.).
     /// </summary>
     public TweakCategory Category { get; set; }

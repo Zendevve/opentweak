@@ -1,0 +1,64 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  OpenTweak -> D:\COMPROG\opentweaks\OpenTweak\bin\Debug\net8.0-windows\OpenTweak.dll
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(110,35): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(131,24): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(153,41): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(176,45): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(221,23): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(244,38): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(270,41): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(296,43): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(331,64): warning CS8604: Possible null reference argument for parameter 'snapshot' in 'Task<bool> BackupService.RestoreSnapshotAsync(Snapshot snapshot, Game game, CancellationToken cancellationToken = default(CancellationToken))'. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(381,64): warning CS8604: Possible null reference argument for parameter 'snapshot' in 'Task<bool> BackupService.RestoreSnapshotAsync(Snapshot snapshot, Game game, CancellationToken cancellationToken = default(CancellationToken))'. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(402,22): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(478,41): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(507,38): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(549,9): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(584,65): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(606,23): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+D:\COMPROG\opentweaks\OpenTweak.Tests\Services\BackupServiceTests.cs(632,45): warning CS8602: Dereference of a possibly null reference. [D:\COMPROG\opentweaks\OpenTweak.Tests\OpenTweak.Tests.csproj]
+  OpenTweak.Tests -> D:\COMPROG\opentweaks\OpenTweak.Tests\bin\Debug\net8.0-windows\OpenTweak.Tests.dll
+Test run for D:\COMPROG\opentweaks\OpenTweak.Tests\bin\Debug\net8.0-windows\OpenTweak.Tests.dll (.NETCoreApp,Version=v8.0)
+VSTest version 17.11.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+  Failed OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_WithValidPage_ReturnsGameInfo [320 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_WithValidPage_ReturnsGameInfo() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs:line 265
+--- End of stack trace from previous location ---
+  Failed OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_ExtractsConfigFilePaths [6 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_ExtractsConfigFilePaths() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs:line 471
+--- End of stack trace from previous location ---
+  Failed OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_WithValidGame_ReturnsGameInfo [8 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_WithValidGame_ReturnsGameInfo() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs:line 82
+--- End of stack trace from previous location ---
+  Failed OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_SkipsCategoryPages [6 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at OpenTweak.Tests.Services.PCGWServiceTests.SearchGameAsync_SkipsCategoryPages() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs:line 232
+--- End of stack trace from previous location ---
+  Failed OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_ExtractsSaveGamePaths [2 ms]
+  Error Message:
+   Assert.NotNull() Failure: Value is null
+  Stack Trace:
+     at OpenTweak.Tests.Services.PCGWServiceTests.GetPageContentAsync_ExtractsSaveGamePaths() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\PCGWServiceTests.cs:line 498
+--- End of stack trace from previous location ---
+  Failed OpenTweak.Tests.Services.TweakEngineTests.ApplyTweaksAsync_SetsAppliedTweakIdsOnSnapshot [9 ms]
+  Error Message:
+   No tweak IDs applied. Failures: Value cannot be null. (Parameter 'sectionName'), Value cannot be null. (Parameter 'sectionName')
+  Stack Trace:
+     at OpenTweak.Tests.Services.TweakEngineTests.ApplyTweaksAsync_SetsAppliedTweakIdsOnSnapshot() in D:\COMPROG\opentweaks\OpenTweak.Tests\Services\TweakEngineTests.cs:line 422
+--- End of stack trace from previous location ---
+
+Failed!  - Failed:     6, Passed:    77, Skipped:     0, Total:    83, Duration: 1 s - OpenTweak.Tests.dll (net8.0)

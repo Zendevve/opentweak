@@ -25,11 +25,10 @@ public class BackupServiceTests : IDisposable
 
     public BackupServiceTests()
     {
-        _backupService = new BackupService();
         _tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        _backupBasePath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "OpenTweak", "Backups");
+        _backupBasePath = Path.Combine(_tempDirectory, "Backups");
+        Directory.CreateDirectory(_tempDirectory);
+        _backupService = new BackupService(_backupBasePath);
         Directory.CreateDirectory(_tempDirectory);
     }
 

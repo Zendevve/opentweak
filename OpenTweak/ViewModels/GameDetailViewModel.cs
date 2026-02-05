@@ -181,13 +181,13 @@ public partial class GameDetailViewModel : ObservableObject
         try
         {
             IsApplying = true;
-            StatusMessage = "Creating backup...";
+            StatusMessage = "Creating backup and applying tweaks...";
 
-            var snapshot = await _tweakEngine.ApplyTweaksAsync(Game, enabledTweaks);
+            var result = await _tweakEngine.ApplyTweaksAsync(Game, enabledTweaks);
 
-            if (snapshot != null)
+            if (result.Snapshot != null)
             {
-                Snapshots.Insert(0, snapshot);
+                Snapshots.Insert(0, result.Snapshot);
 
                 // Update game's last tweaked date
                 Game.LastTweakedDate = DateTime.UtcNow;
@@ -195,7 +195,28 @@ public partial class GameDetailViewModel : ObservableObject
             }
 
             ShowDiffPreview = false;
-            StatusMessage = $"Applied {enabledTweaks.Count} tweaks! Backup created.";
+
+            if (result.AllSucceeded)
+            {
+                StatusMessage = $"✓ Successfully applied {result.SuccessfulTweaks.Count} tweaks!";
+            }
+            else if (result.HasFailures)
+            {
+                var failureCount = result.FailedTweaks.Count;
+                var successCount = result.SuccessfulTweaks.Count;
+                StatusMessage = $"⚠ Completed with issues: {successCount} applied, {failureCount} failed.";
+
+                // Detailed reporting (in a real app, this might show a dialog)
+                foreach(var fail in result.FailedTweaks)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Failed tweak {fail.Recipe.Name}: {fail.ErrorMessage}");
+                }
+            }
+            else
+            {
+                // Should not happen if tweaks were selected
+                StatusMessage = "No tweaks were applied.";
+            }
         }
         catch (Exception ex)
         {
