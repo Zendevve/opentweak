@@ -42,6 +42,85 @@ public class TweakEngine : ITweakEngine
         public bool IsNewEntry { get; set; }
     }
 
+    #region Validation Methods
+
+    /// <summary>
+    /// Validates a single recipe and updates its IsSupported/UnsupportedReason properties.
+    /// Call this before exposing recipes to UI or applying them.
+    /// </summary>
+    public TweakRecipe ValidateRecipe(TweakRecipe recipe)
+    {
+        // Reset validation state
+        recipe.IsSupported = true;
+        recipe.UnsupportedReason = null;
+
+        // Check for unsupported target types
+        if (recipe.TargetType == TweakTargetType.Registry)
+        {
+            recipe.IsSupported = false;
+            recipe.UnsupportedReason = "Registry modifications are not yet implemented safely.";
+            _logger.LogDebug("Filtered unsupported recipe: {Key} - Registry target type", recipe.Key);
+            return recipe;
+        }
+
+        // Check for file existence if creation is not allowed
+        if (!recipe.AllowFileCreation && !string.IsNullOrEmpty(recipe.FilePath))
+        {
+            var expandedPath = Environment.ExpandEnvironmentVariables(recipe.FilePath);
+            if (!File.Exists(expandedPath))
+            {
+                recipe.IsSupported = false;
+                recipe.UnsupportedReason = $"Target file does not exist: {expandedPath}";
+                _logger.LogDebug("Filtered unsupported recipe: {Key} - File not found and creation not allowed", recipe.Key);
+                return recipe;
+            }
+        }
+
+        // Check for missing key
+        if (string.IsNullOrWhiteSpace(recipe.Key))
+        {
+            recipe.IsSupported = false;
+            recipe.UnsupportedReason = "Recipe has no key specified.";
+            return recipe;
+        }
+
+        return recipe;
+    }
+
+    /// <summary>
+    /// Filters recipes into supported and unsupported lists.
+    /// Use this before exposing recipes to UI to hide unsupported types.
+    /// </summary>
+    public (List<TweakRecipe> Supported, List<TweakRecipe> Unsupported) FilterSupportedRecipes(IEnumerable<TweakRecipe> recipes)
+    {
+        var supported = new List<TweakRecipe>();
+        var unsupported = new List<TweakRecipe>();
+
+        foreach (var recipe in recipes)
+        {
+            ValidateRecipe(recipe);
+
+            if (recipe.IsSupported)
+            {
+                supported.Add(recipe);
+            }
+            else
+            {
+                unsupported.Add(recipe);
+            }
+        }
+
+        if (unsupported.Count > 0)
+        {
+            _logger.LogInformation("Filtered {UnsupportedCount} unsupported recipes, {SupportedCount} remain",
+                unsupported.Count, supported.Count);
+        }
+
+        return (supported, unsupported);
+    }
+
+    #endregion
+
     /// <summary>
     /// Generates a preview of what changes will be made without applying them.
     /// This is the "Diff view" mentioned in the PRD.

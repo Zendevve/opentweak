@@ -387,33 +387,16 @@ public class PCGWService : IPCGWService
 
     /// <summary>
     /// Extracts registry modifications from wiki text.
+    /// NOTE: Registry modifications are not yet implemented safely in the engine.
+    /// This method returns an empty list to prevent unsupported recipes from reaching UI.
     /// </summary>
     private List<TweakRecipe> ExtractRegistryFixes(string wikiText, Guid gameId, string gameTitle)
     {
-        var recipes = new List<TweakRecipe>();
-
-        // Pattern for registry edits
-        var regPattern = @"(?:Registry|regedit).*?(?:path|key)[:=]*\s*[``""']?(HKEY_[^``""'\n]+)[``""']?[^\n]*(?:value|name)[:=]*\s*[``""']?([\w_]+)[``""']?[^\n]*(?:data|value)[:=]*\s*[``""']?([^``""'\n]+)[``""']?";
-
-        var matches = Regex.Matches(wikiText, regPattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
-
-        foreach (Match match in matches)
-        {
-            recipes.Add(new TweakRecipe
-            {
-                GameId = gameId,
-                Category = TweakCategory.Other,
-                Description = $"Registry modification: {match.Groups[2].Value}",
-                TargetType = TweakTargetType.Registry,
-                FilePath = match.Groups[1].Value,
-                Key = match.Groups[2].Value,
-                Value = match.Groups[3].Value.Trim(),
-                RiskLevel = "High",
-                SourceUrl = $"https://www.pcgamingwiki.com/wiki/{Uri.EscapeDataString(gameTitle)}"
-            });
-        }
-
-        return recipes;
+        // Registry modifications are extracted but not yet supported for safe application.
+        // The TweakEngine throws NotSupportedException when applying Registry tweaks.
+        // Rather than expose recipes that will always fail, we skip extraction entirely.
+        _logger.LogDebug("Skipping registry fix extraction for {GameTitle} - Registry support not yet implemented", gameTitle);
+        return new List<TweakRecipe>();
     }
 
     /// <summary>

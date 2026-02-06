@@ -52,6 +52,17 @@ public interface IPCGWService
 public interface ITweakEngine
 {
     /// <summary>
+    /// Validates a single recipe and updates its IsSupported/UnsupportedReason properties.
+    /// </summary>
+    TweakRecipe ValidateRecipe(TweakRecipe recipe);
+
+    /// <summary>
+    /// Filters recipes into supported and unsupported lists.
+    /// Use this before exposing recipes to UI to hide unsupported types.
+    /// </summary>
+    (List<TweakRecipe> Supported, List<TweakRecipe> Unsupported) FilterSupportedRecipes(IEnumerable<TweakRecipe> recipes);
+
+    /// <summary>
     /// Previews what changes will be made by the tweaks.
     /// </summary>
     Task<List<TweakEngine.TweakChange>> PreviewTweaksAsync(IEnumerable<TweakRecipe> recipes, CancellationToken cancellationToken = default);

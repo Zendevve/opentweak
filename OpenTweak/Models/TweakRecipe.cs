@@ -106,4 +106,21 @@ public class TweakRecipe
     /// Risk level: Low (cosmetic), Medium (gameplay), High (stability).
     /// </summary>
     public string RiskLevel { get; set; } = "Low";
+
+    /// <summary>
+    /// Whether this recipe can be applied by the current engine.
+    /// Set by validation stage; recipes marked false are filtered from UI.
+    /// </summary>
+    public bool IsSupported { get; set; } = true;
+
+    /// <summary>
+    /// If IsSupported is false, explains why (e.g., "Registry tweaks not yet implemented").
+    /// </summary>
+    public string? UnsupportedReason { get; set; }
+
+    /// <summary>
+    /// When true, allows creating new config files if they don't exist.
+    /// Default is false for safety - prevents accidental file creation.
+    /// </summary>
+    public bool AllowFileCreation { get; set; } = false;
 }

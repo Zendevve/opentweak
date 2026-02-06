@@ -110,6 +110,9 @@ public partial class App : Application
         services.AddHttpClient<IPCGWService, PCGWService>()
             .AddPolicyHandler(retryPolicy);
 
+        // PCGW result caching to reduce API calls
+        services.AddSingleton<PCGWCache>();
+
         services.AddSingleton<IGameScanner, GameScanner>();
 
         // TweakEngine depends on IBackupService
