@@ -5,6 +5,8 @@
 
 using System.IO;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +34,7 @@ public partial class MainViewModel : ObservableObject
     private readonly IDatabaseService _databaseService;
     private readonly IPCGWService _pcgwService;
     private readonly INotificationService _notificationService;
+    private readonly ICollectionView _gamesView;
 
     [ObservableProperty]
     private ObservableCollection<Game> _games = new();
@@ -79,8 +82,23 @@ public partial class MainViewModel : ObservableObject
         _pcgwService = pcgwService;
         _notificationService = notificationService;
 
+        // Create the view for filtering and sorting
+        _gamesView = CollectionViewSource.GetDefaultView(Games);
+        _gamesView.Filter = FilterGames;
+
         // Load cached games on startup
         LoadCachedGames();
+    }
+
+    /// <summary>
+    /// Filter predicate for the games collection.
+    /// </summary>
+    private bool FilterGames(object item)
+    {
+        if (item is not Game game) return false;
+        if (string.IsNullOrWhiteSpace(SearchQuery)) return true;
+
+        return game.Name.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -265,16 +283,16 @@ public partial class MainViewModel : ObservableObject
     /// </summary>
     partial void OnSearchQueryChanged(string value)
     {
-        // In a real app, this would filter the observable collection
-        // For now, just show how many match
+        _gamesView.Refresh();
+
         if (string.IsNullOrWhiteSpace(value))
         {
             StatusMessage = $"{Games.Count} games";
         }
         else
         {
-            var matches = Games.Count(g => g.Name.Contains(value, StringComparison.OrdinalIgnoreCase));
-            StatusMessage = $"{matches} games match '{value}'";
+            var matchedCount = Games.Count(g => FilterGames(g));
+            StatusMessage = $"{matchedCount} games match '{value}'";
         }
     }
 }

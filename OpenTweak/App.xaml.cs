@@ -103,7 +103,6 @@ public partial class App : Application
         // Resilience Policy
         var retryPolicy = HttpPolicyExtensions
             .HandleTransientHttpError()
-            .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound) // Handling PCGW weirdness
             .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
         // Register HTTP Client with Polly

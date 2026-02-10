@@ -16,19 +16,15 @@ namespace OpenTweak.Services;
 /// </summary>
 public class GameScanner : IGameScanner
 {
-    private readonly List<Game> _detectedGames = new();
-
     /// <summary>
     /// Scans all supported launchers and returns detected games.
     /// </summary>
     public async Task<List<Game>> ScanAllLaunchersAsync(CancellationToken cancellationToken = default)
     {
-        _detectedGames.Clear();
-
         if (cancellationToken.IsCancellationRequested)
-            return _detectedGames;
+            return new List<Game>();
 
-        var tasks = new List<Task>
+        var tasks = new List<Task<List<Game>>>
         {
             Task.Run(() => ScanSteam(cancellationToken), cancellationToken),
             Task.Run(() => ScanEpicGames(cancellationToken), cancellationToken),
@@ -38,14 +34,13 @@ public class GameScanner : IGameScanner
 
         try
         {
-            await Task.WhenAll(tasks);
+            var results = await Task.WhenAll(tasks);
+            return results.SelectMany(g => g).OrderBy(g => g.Name).ToList();
         }
         catch (OperationCanceledException)
         {
-            // Ignore cancellation exceptions
+            return new List<Game>();
         }
-
-        return _detectedGames.OrderBy(g => g.Name).ToList();
     }
 
     #region Steam Scanner
@@ -53,15 +48,16 @@ public class GameScanner : IGameScanner
     /// <summary>
     /// Scans Steam libraries by parsing libraryfolders.vdf and appmanifest files.
     /// </summary>
-    private void ScanSteam(CancellationToken cancellationToken)
+    private List<Game> ScanSteam(CancellationToken cancellationToken)
     {
+        var games = new List<Game>();
         try
         {
             var steamPaths = GetSteamLibraryPaths();
 
             foreach (var libraryPath in steamPaths)
             {
-                if (cancellationToken.IsCancellationRequested) return;
+                if (cancellationToken.IsCancellationRequested) break;
 
                 var steamAppsPath = Path.Combine(libraryPath, "steamapps");
                 if (!Directory.Exists(steamAppsPath)) continue;
@@ -70,15 +66,12 @@ public class GameScanner : IGameScanner
 
                 foreach (var manifest in manifestFiles)
                 {
-                    if (cancellationToken.IsCancellationRequested) return;
+                    if (cancellationToken.IsCancellationRequested) break;
 
                     var game = ParseSteamManifest(manifest, steamAppsPath);
                     if (game != null)
                     {
-                        lock (_detectedGames)
-                        {
-                            _detectedGames.Add(game);
-                        }
+                        games.Add(game);
                     }
                 }
             }
@@ -87,6 +80,7 @@ public class GameScanner : IGameScanner
         {
             System.Diagnostics.Debug.WriteLine($"Steam scan error: {ex.Message}");
         }
+        return games;
     }
 
     private List<string> GetSteamLibraryPaths()
@@ -171,29 +165,27 @@ public class GameScanner : IGameScanner
     /// <summary>
     /// Scans Epic Games by parsing .item manifest files.
     /// </summary>
-    private void ScanEpicGames(CancellationToken cancellationToken)
+    private List<Game> ScanEpicGames(CancellationToken cancellationToken)
     {
+        var games = new List<Game>();
         try
         {
             var manifestsPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
                 "Epic", "EpicGamesLauncher", "Data", "Manifests");
 
-            if (!Directory.Exists(manifestsPath)) return;
+            if (!Directory.Exists(manifestsPath)) return games;
 
             var itemFiles = Directory.GetFiles(manifestsPath, "*.item");
 
             foreach (var itemFile in itemFiles)
             {
-                if (cancellationToken.IsCancellationRequested) return;
+                if (cancellationToken.IsCancellationRequested) break;
 
                 var game = ParseEpicManifest(itemFile);
                 if (game != null)
                 {
-                    lock (_detectedGames)
-                    {
-                        _detectedGames.Add(game);
-                    }
+                    games.Add(game);
                 }
             }
         }
@@ -201,6 +193,7 @@ public class GameScanner : IGameScanner
         {
             System.Diagnostics.Debug.WriteLine($"Epic scan error: {ex.Message}");
         }
+        return games;
     }
 
     private Game? ParseEpicManifest(string itemPath)
@@ -246,8 +239,9 @@ public class GameScanner : IGameScanner
     /// <summary>
     /// Scans GOG Galaxy by reading registry keys.
     /// </summary>
-    private void ScanGOG(CancellationToken cancellationToken)
+    private List<Game> ScanGOG(CancellationToken cancellationToken)
     {
+        var games = new List<Game>();
         try
         {
             // Check both 32-bit and 64-bit registry locations
@@ -259,14 +253,14 @@ public class GameScanner : IGameScanner
 
             foreach (var regPath in registryPaths)
             {
-                if (cancellationToken.IsCancellationRequested) return;
+                if (cancellationToken.IsCancellationRequested) break;
 
                 using var gamesKey = Registry.LocalMachine.OpenSubKey(regPath);
                 if (gamesKey == null) continue;
 
                 foreach (var gameIdStr in gamesKey.GetSubKeyNames())
                 {
-                    if (cancellationToken.IsCancellationRequested) return;
+                    if (cancellationToken.IsCancellationRequested) break;
 
                     using var gameKey = gamesKey.OpenSubKey(gameIdStr);
                     if (gameKey == null) continue;
@@ -281,17 +275,14 @@ public class GameScanner : IGameScanner
                     if (!Directory.Exists(gamePath))
                         continue;
 
-                    lock (_detectedGames)
+                    games.Add(new Game
                     {
-                        _detectedGames.Add(new Game
-                        {
-                            Name = gameName,
-                            InstallPath = gamePath,
-                            LauncherType = LauncherType.GOG,
-                            AppId = gameId ?? gameIdStr,
-                            PCGWTitle = gameName
-                        });
-                    }
+                        Name = gameName,
+                        InstallPath = gamePath,
+                        LauncherType = LauncherType.GOG,
+                        AppId = gameId ?? gameIdStr,
+                        PCGWTitle = gameName
+                    });
                 }
             }
         }
@@ -299,6 +290,7 @@ public class GameScanner : IGameScanner
         {
             System.Diagnostics.Debug.WriteLine($"GOG scan error: {ex.Message}");
         }
+        return games;
     }
 
     #endregion
@@ -308,8 +300,9 @@ public class GameScanner : IGameScanner
     /// <summary>
     /// Scans Xbox/Microsoft Store games (basic implementation).
     /// </summary>
-    private void ScanXbox(CancellationToken cancellationToken)
+    private List<Game> ScanXbox(CancellationToken cancellationToken)
     {
+        var games = new List<Game>();
         try
         {
             // Xbox Game Pass games are in WindowsApps or XboxGames folders
@@ -322,7 +315,7 @@ public class GameScanner : IGameScanner
 
             foreach (var basePath in xboxPaths)
             {
-                if (cancellationToken.IsCancellationRequested) return;
+                if (cancellationToken.IsCancellationRequested) break;
                 if (!Directory.Exists(basePath)) continue;
 
                 // XboxGames folder has a simpler structure
@@ -330,22 +323,19 @@ public class GameScanner : IGameScanner
                 {
                     foreach (var gameDir in Directory.GetDirectories(basePath))
                     {
-                        if (cancellationToken.IsCancellationRequested) return;
+                        if (cancellationToken.IsCancellationRequested) break;
 
                         var contentDir = Path.Combine(gameDir, "Content");
                         if (Directory.Exists(contentDir))
                         {
                             var gameName = Path.GetFileName(gameDir);
-                            lock (_detectedGames)
+                            games.Add(new Game
                             {
-                                _detectedGames.Add(new Game
-                                {
-                                    Name = gameName,
-                                    InstallPath = contentDir,
-                                    LauncherType = LauncherType.Xbox,
-                                    PCGWTitle = gameName
-                                });
-                            }
+                                Name = gameName,
+                                InstallPath = contentDir,
+                                LauncherType = LauncherType.Xbox,
+                                PCGWTitle = gameName
+                            });
                         }
                     }
                 }
@@ -355,6 +345,7 @@ public class GameScanner : IGameScanner
         {
             System.Diagnostics.Debug.WriteLine($"Xbox scan error: {ex.Message}");
         }
+        return games;
     }
 
     #endregion
