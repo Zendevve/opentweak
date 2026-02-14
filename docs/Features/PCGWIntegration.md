@@ -41,16 +41,15 @@ flowchart TD
     SaveGames --> Pattern2[Regex: {{Game data/saves|...}}]
 
     Recipes --> IniFixes[ExtractIniFixes]
-    Recipes --> RegFixes[ExtractRegistryFixes]
     Recipes --> CmdFixes[ExtractCommandLineFixes]
 
     IniFixes --> ParseCode[Parse <pre> blocks]
-    RegFixes --> ParseReg[Parse registry patterns]
     CmdFixes --> ParseCmd[Parse launch options]
 
     ParseCode --> CreateRecipes[Create TweakRecipe objects]
-    ParseReg --> CreateRecipes
     ParseCmd --> CreateRecipes
+
+    Note1[NOTE: ExtractRegistryFixes returns empty list - Registry not supported] -.-> Recipes
 
     CreateRecipes --> Cache[Cache to LiteDB]
     Cache --> Display[Display in GameDetailView]
@@ -155,14 +154,15 @@ OpenTweak/1.0 (Automated Game Tweaks)
 | Type | Pattern | Example |
 |------|---------|---------|
 | INI | `[Section]\nKey=Value` | `[Graphics]\nMotionBlur=0` |
-| Registry | `HKEY_...\Key\Value` | `HKEY_CURRENT_USER\Game\Setting` |
 | Command Line | `-argument` | `-novid -high` |
+
+> **Not Extracted:** Registry patterns are NOT extracted. `ExtractRegistryFixes` returns an empty list because the TweakEngine blocks registry modifications.
 
 ### Extraction Methods
 
 1. **ExtractIniFixes**: Parses `<pre>` blocks and INI-style patterns
-2. **ExtractRegistryFixes**: Matches registry key/value patterns
-3. **ExtractCommandLineFixes**: Finds launch option arguments
+2. **ExtractCommandLineFixes**: Finds launch option arguments
+3. ~~ExtractRegistryFixes~~: Returns empty list (registry not supported)
 
 ---
 

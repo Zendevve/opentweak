@@ -11,7 +11,9 @@ Tests: [`OpenTweak.Tests/Services/TweakEngineTests.cs`](../../OpenTweak.Tests/Se
 
 ## Summary
 
-Safely applies configuration tweaks with automatic backup and restore capabilities. Supports INI, CFG, JSON, XML files, and Windows Registry modifications. Uses Salaros.ConfigParser to preserve comments in config files.
+Safely applies configuration tweaks with automatic backup and restore capabilities. Supports INI, CFG, JSON, and XML config files. Uses Salaros.ConfigParser to preserve comments in config files.
+
+> **Note:** Registry modifications are NOT supported. The engine explicitly blocks registry tweaks at validation with the reason "Registry modifications are not yet implemented safely." This is a deliberate safety decision.
 
 ---
 
@@ -44,7 +46,6 @@ flowchart TD
     ApplyEach --> Ini[ApplyIniTweakAsync]
     ApplyEach --> Json[ApplyJsonTweakAsync]
     ApplyEach --> Xml[ApplyXmlTweakAsync]
-    ApplyEach --> Reg[ApplyRegistryTweak]
 
     Ini --> UseParser[Use Salaros.ConfigParser]
     UseParser --> PreserveComments[Preserve comments]
@@ -159,7 +160,8 @@ public class Snapshot
 | INI/CFG | `ApplyIniTweakAsync` | Salaros.ConfigParser |
 | JSON | `ApplyJsonTweakAsync` | System.Text.Json |
 | XML | `ApplyXmlTweakAsync` | System.Xml.XmlDocument |
-| Registry | `ApplyRegistryTweak` | Microsoft.Win32.Registry |
+
+> **Not Supported:** Registry modifications are blocked at validation. Recipes with `TargetType.Registry` are marked `IsSupported=false` and filtered from the UI.
 
 ### Environment Variable Expansion
 

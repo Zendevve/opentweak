@@ -21,7 +21,7 @@ OpenTweak scans for installed games across multiple launchers, fetches tweak rec
 **In scope:**
 - Game discovery from Steam, Epic, GOG, Xbox, Manual
 - PCGamingWiki Cargo API integration
-- Config file modification (INI, CFG, JSON, XML, Registry)
+- Config file modification (INI, CFG, JSON, XML)
 - Automatic backup and restore
 - Windows 11 WPF UI with Mica backdrop
 
@@ -29,6 +29,9 @@ OpenTweak scans for installed games across multiple launchers, fetches tweak rec
 - Game installation/management
 - Online multiplayer modifications
 - Cheat/hack detection bypass
+- **Registry modifications** (explicitly blocked at validation)
+
+> **Note:** Registry modifications are not supported. The TweakEngine validates recipes and marks any with `TargetType.Registry` as unsupported. The PCGWService skips registry extraction entirely.
 
 ---
 
@@ -66,7 +69,6 @@ flowchart TB
         GOG[GOG Registry]
         Xbox[Xbox Game Pass]
         Files[Config Files]
-        Reg[Windows Registry]
     end
 
     MW --> MVM
@@ -83,7 +85,6 @@ flowchart TB
     PCGW --> PCGW_API
     TE --> BS
     TE --> Files
-    TE --> Reg
     BS --> Files
     DBS --> G
     DBS --> TR
@@ -110,7 +111,6 @@ flowchart LR
         Cargo[Cargo API]
         Wiki[Wiki Parse API]
         Files[File System]
-        Reg[Registry]
     end
 
     UI --Commands--> Services
@@ -118,7 +118,6 @@ flowchart LR
     PCGW_API --HTTP--> Cargo
     PCGW_API --HTTP--> Wiki
     TE_API --> Files
-    TE_API --> Reg
     BS_API --> Files
 ```
 
